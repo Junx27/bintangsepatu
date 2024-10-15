@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import Label from "./Label";
-import PrimaryButton from "./PrimaryButton";
-import Empty from "./Empty";
+import Label from "../../../Components/Label";
+import PrimaryButton from "../../../Components/PrimaryButton";
+import Empty from "../../../Components/Empty";
 import { useForm } from "@inertiajs/react";
 
-const Test = ({ dataBahanBaku, id, userId }) => {
+const BahanBaku = ({ dataBahanBaku, id, userId }) => {
     const [jumlah, setJumlah] = useState("");
     const [dataProduksiDetail, setDataProduksiDetail] = useState([]);
     const [selectedBahanBaku, setSelectedBahanBaku] = useState(null);
@@ -276,4 +276,4 @@ const Test = ({ dataBahanBaku, id, userId }) => {
     );
 };
 
-export default Test;
+export default BahanBaku;

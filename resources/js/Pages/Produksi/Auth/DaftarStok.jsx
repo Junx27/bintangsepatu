@@ -4,12 +4,9 @@ import React, { useEffect, useState } from "react";
 import { navbarProduksi } from "../Data/NavbarProduksi";
 import Table from "@/Layouts/Tabel";
 import InputLabel from "@/Components/InputLabel";
-import TextInput from "@/Components/TextInput";
 import { useForm } from "@inertiajs/react";
-import InputError from "@/Components/InputError";
 import PrimaryButton from "@/Components/PrimaryButton";
 import PopOver from "@/Components/PopOver";
-import FormaterRupiah from "@/Layouts/FormaterRupiah";
 import Pagination from "@/Layouts/Pagination";
 import Label from "@/Components/Label";
 

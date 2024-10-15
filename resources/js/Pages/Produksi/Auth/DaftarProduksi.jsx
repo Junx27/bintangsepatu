@@ -4,15 +4,13 @@ import React, { useEffect, useState } from "react";
 import { navbarProduksi } from "../Data/NavbarProduksi";
 import axios from "axios";
 import Label from "@/Components/Label";
-import Table from "@/Layouts/Tabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import { useForm } from "@inertiajs/react";
 import InputLabel from "@/Components/InputLabel";
 import InputError from "@/Components/InputError";
 import TextInput from "@/Components/TextInput";
 import PopOver from "@/Components/PopOver";
-import Test from "@/Components/Test";
-import Empty from "@/Components/Empty";
+import BahanBaku from "../Layouts/BahanBaku";
 
 function DaftarProduksi({ auth }) {
     const [id, setId] = useState(null);
@@ -487,7 +485,7 @@ function DaftarProduksi({ auth }) {
                         )}
                         {tambahBahanBaku && (
                             <div className="w-full h-screen">
-                                <Test
+                                <BahanBaku
                                     dataBahanBaku={dataBahanBaku}
                                     id={id}
                                     userId={auth.user.id}

@@ -2,8 +2,7 @@ import Navbar from "@/Layouts/Navbar";
 import RoleAccess from "@/Middleware/RoleAcces";
 import React, { useEffect, useState } from "react";
 import { navbarProduksi } from "../Data/NavbarProduksi";
-import Test from "@/Components/Test";
-import ChartProduksi from "@/Layouts/ChartProduksi";
+import ChartProduksi from "@/Pages/Produksi/Layouts/ChartProduksi";
 import axios from "axios";
 import Label from "@/Components/Label";
 import FormaterRupiah from "@/Layouts/FormaterRupiah";
@@ -11,9 +10,9 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import FormateDate from "@/Components/FormateDate";
 import Table from "@/Layouts/Tabel";
 import _ from "lodash";
-import HeaderLaporan from "@/Layouts/HeaderLaporan";
+import HeaderLaporan from "@/Pages/Produksi/Layouts/HeaderLaporan";
 import PopOver from "@/Components/PopOver";
-import CreateProdukMasuk from "@/Layouts/CreateProdukMasuk";
+import CreateProdukMasuk from "@/Pages/Produksi/Layouts/CreateProdukMasuk";
 
 function Dashboard({ auth }) {
     const [view, setView] = useState("diagram");

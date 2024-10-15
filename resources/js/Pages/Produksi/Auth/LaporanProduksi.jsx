@@ -8,10 +8,9 @@ import _ from "lodash";
 import Table from "@/Layouts/Tabel";
 import FormateDate from "@/Components/FormateDate";
 import PrimaryButton from "@/Components/PrimaryButton";
-import CreateLaporan from "@/Layouts/CreateLaporan";
+import CreateLaporan from "@/Pages/Produksi/Layouts/CreateLaporan";
 import FormaterRupiah from "@/Layouts/FormaterRupiah";
-import PopOver from "@/Components/PopOver";
-import VerifikasiLaporan from "@/Layouts/VerifikasiLaporan";
+import VerifikasiLaporan from "@/Pages/Produksi/Layouts/VerifikasiLaporan";
 
 function LaporanProduksi({ auth }) {
     const [dataProduksi, setDataProduksi] = useState([]);
