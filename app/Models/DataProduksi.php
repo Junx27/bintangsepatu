@@ -10,6 +10,7 @@ class DataProduksi extends Model
     use HasFactory;
 
     protected $fillable = [
+        "stok_awal",
         'jumlah_bahan_baku',
         'bahan_baku_id',
         'produksi_id',
@@ -18,5 +19,9 @@ class DataProduksi extends Model
     public function bahan()
     {
         return $this->belongsTo(BahanBaku::class, "bahan_baku_id");
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class, "user_id");
     }
 }

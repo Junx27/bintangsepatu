@@ -19,7 +19,7 @@ export const navbarProduksi = [
     },
     {
         id: 4,
-        nama: "Stok Barang",
+        nama: "Bahan Baku",
         link: "/daftar-stok-produksi",
         gambar: "/assets/icons/stock.png",
     },

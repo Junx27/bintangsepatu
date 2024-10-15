@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\BahanBaku;
 use App\Models\CatatanProduksi;
 use App\Models\CatatanStok;
+use App\Models\DataLaporan;
+use App\Models\DataProdukMasuk;
 use App\Models\DataProduksi;
+use App\Models\LaporanProduksi;
 use App\Models\Produk;
 use App\Models\Produksi;
 use Illuminate\Http\Request;
@@ -134,6 +137,7 @@ class ProduksiController extends Controller
     {
         // Validasi input
         $validated = $request->validate([
+            "produksi.*.stok_awal" => 'required|integer',
             "produksi.*.jumlah_bahan_baku" => 'required|integer',
             "produksi.*.bahan_baku_id" => "required|integer",
             "produksi.*.produksi_id" => "required|integer",
@@ -163,5 +167,97 @@ class ProduksiController extends Controller
         }
 
         return Inertia::location("/laporan-produksi");
+    }
+    public function createSisaBahanBaku(Request $request)
+    {
+        $validated = $request->validate([
+            "produksi.*.jumlah_bahan_baku" => 'required|integer',
+            "produksi.*.pemakaian_bahan_baku" => 'required|integer',
+            "produksi.*.sisa_bahan_baku" => 'required|integer',
+            "produksi.*.bahan_baku_id" => "required|integer",
+            "produksi.*.laporan_id" => "required|integer",
+            "produksi.*.user_id" => "required|integer",
+        ]);
+
+        // Loop melalui setiap entri produksi
+        foreach ($validated['produksi'] as $produksi) {
+            // Simpan data produksi
+            DataLaporan::create($produksi);
+
+            // Update stok produk berdasarkan ID produk
+            $produk = BahanBaku::find($produksi['bahan_baku_id']);
+            if ($produk) {
+                $produk->stok_bahan_baku += $produksi['pemakaian_bahan_baku']; // Kurangi stok
+                $produk->save(); // Simpan perubahan
+            }
+            $dataLaporan = LaporanProduksi::find($produksi['laporan_id']);
+            if ($dataLaporan) {
+                $dataLaporan->status_produksi = "diverifikasi";
+                $dataLaporan->save();
+            }
+        }
+
+        return Inertia::location("/dashboard-produksi");
+        // dd($request->all());
+    }
+
+    public function createLaporan(Request $request)
+    {
+        $validated = $request->validate([
+            "id_laporan" => "required",
+            "id_produk" => "required",
+            "id_produksi" => "required",
+            "tanggal_mulai" => "required",
+            "tanggal_selesai" => "required",
+            "estimasi_selesai" => "required",
+            "jumlah_produksi" => "required",
+            "biaya_produksi" => "required",
+            "penanggung_jawab_produksi" => "required",
+            "user_id" => "required",
+            "produk_id" => "required",
+            "produksi_id" => "required",
+        ]);
+        $existingRecord = LaporanProduksi::where('id_laporan', $validated['id_laporan'])->first();
+
+        if ($existingRecord) {
+            return back()->withErrors(['message' => 'Data id laporan sudah ada. Gagal menambahkan data laporan! Coba dengan id laporan yang berbeda.']);
+        }
+
+        $produksi = Produksi::findOrFail($validated["produksi_id"]);
+        $produksi->status_produksi = "selesai";
+        $produksi->save();
+
+
+        LaporanProduksi::create($validated);
+        return Inertia::location("/laporan-produksi");
+    }
+
+    public function createDataProdukMasuk(Request $request)
+    {
+        $validated = $request->validate([
+            'id_produksi_masuk' => "required",
+            'id_laporan' => "required",
+            'id_produksi' => "required",
+            'id_produk' => "required",
+            'tanggal_pengiriman_produk' => "required",
+            'jumlah_produksi' => "required",
+            'biaya_awal_produksi' => "required",
+            'biaya_akhir_produksi' => "required",
+            'laporan_id' => "required",
+            'produksi_id' => "required",
+            'produk_id' => "required",
+            'user_id' => "required",
+        ]);
+
+        $laporan = LaporanProduksi::findOrFail($validated["laporan_id"]);
+
+        if ($laporan) {
+            $laporan->status_pengiriman = "terkirim";
+            $laporan->save();
+        }
+
+        DataProdukMasuk::create($validated);
+        return Inertia::location("/dashboard-produksi");
+        // dd($request->all());
     }
 }

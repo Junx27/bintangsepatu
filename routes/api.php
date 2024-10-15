@@ -13,9 +13,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get("/api/bintangsepatu/produksi/{id}", [ApiController::class, "ProduksiDetail"]);
     Route::get("/api/bintangsepatu/produksis", [ApiController::class, "ProduksiAll"]);
     Route::get("/api/bintangsepatu/produksi-proses", [ApiController::class, "ProduksiAllProses"]);
+    Route::get("/api/bintangsepatu/produksi-verification", [ApiController::class, "ProduksiAllVerified"]);
     Route::get("/api/bintangsepatu/bahan-bakus", [ApiController::class, "bahanBakuAll"]);
     Route::get("/api/bintangsepatu/laporan-produksis", [ApiController::class, "laporanProduksiAll"]);
+    Route::get("/api/bintangsepatu/laporan-produksi/{id}", [ApiController::class, "laporanProduksiDetail"]);
+    Route::get("/api/bintangsepatu/laporan-produksis-verified", [ApiController::class, "laporanProduksiAllVerified"]);
+    Route::get("/api/bintangsepatu/laporan-produksis-verified-success", [ApiController::class, "laporanProduksiAllVerifiedSuccess"]);
     Route::get("/api/bintangsepatu/laporan-pemesanans", [ApiController::class, "laporanPemesananAll"]);
     Route::get("/api/bintangsepatu/pengirimans", [ApiController::class, "pengirimanAll"]);
     Route::get("/api/bintangsepatu/data-produksis", [ApiController::class, "dataProduksiAll"]);
+    Route::get("/api/bintangsepatu/data-laporan-produksis", [ApiController::class, "dataLaporanProduksi"]);
 });

@@ -119,7 +119,7 @@ function DaftarProduk({ auth }) {
                 </PopOver>
             )}
             <Navbar navbar={navbarProduksi} title={"Daftar Produk"}>
-                <div className="flex">
+                <div className="flex ml-12 pl-2 mt-2">
                     <div className="w-full relative">
                         <Table
                             header={[

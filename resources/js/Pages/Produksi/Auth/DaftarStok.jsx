@@ -110,7 +110,7 @@ function DaftarStok({ auth }) {
                 </PopOver>
             )}
             <Navbar navbar={navbarProduksi} title={"Daftar Stok"}>
-                <div className="flex">
+                <div className="flex ml-12 pl-2 mt-2">
                     <div className="w-full relative">
                         <Table
                             header={[
@@ -119,7 +119,7 @@ function DaftarStok({ auth }) {
                                 "Stok Bahan Baku",
                                 "Minimum Stok",
                                 "Satuan Bahan Baku",
-                                "Status Bahan Baku",
+                                "Harga Bahan Baku",
                             ]}
                         >
                             {getCurrentPageData().map((i) => (
@@ -188,7 +188,7 @@ function DaftarStok({ auth }) {
                                         {i.satuan_bahan_baku}
                                     </td>
                                     <td className="px-5 py-2 border border-r-0">
-                                        {i.status_bahan_baku}
+                                        {i.harga_bahan_baku}
                                     </td>
                                 </tr>
                             ))}

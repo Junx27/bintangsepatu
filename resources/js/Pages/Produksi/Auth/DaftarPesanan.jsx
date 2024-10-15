@@ -18,44 +18,48 @@ function DaftarPesanan({ auth }) {
     return (
         <RoleAccess auth={auth} role={"produksi"}>
             <Navbar navbar={navbarProduksi} title={"Daftar Pesanan"}>
-                <Table
-                    header={[
-                        "Id Pesanan",
-                        "Nama Pemesan",
-                        "Id Produk",
-                        "Nama Produk",
-                        "QTY",
-                        "Harga Produk",
-                        "Total Pesanan",
-                    ]}
-                >
-                    {data.map((i) => (
-                        <tr
-                            key={i.id}
-                            className="hover:bg-blue-50 cursor-pointer"
-                        >
-                            <td className="px-3 py-2 border">{i.id_pesanan}</td>
-                            <td className="px-3 py-2 border">
-                                {i.nama_pemesan}
-                            </td>
-                            <td className="px-3 py-2 border">
-                                {i.produk.id_produk}
-                            </td>
-                            <td className="px-3 py-2 border">
-                                {i.produk.nama_produk}
-                            </td>
-                            <td className="px-3 py-2 border text-center">
-                                {i.jumlah_pesanan}
-                            </td>
-                            <td className="px-3 py-2 border text-end">
-                                {i.produk.harga_produk}
-                            </td>
-                            <td className="px-3 py-2 border text-end">
-                                {i.produk.harga_produk * i.jumlah_pesanan}
-                            </td>
-                        </tr>
-                    ))}
-                </Table>
+                <div className="ml-12 mt-3">
+                    <Table
+                        header={[
+                            "Id Pesanan",
+                            "Nama Pemesan",
+                            "Id Produk",
+                            "Nama Produk",
+                            "QTY",
+                            "Harga Produk",
+                            "Total Pesanan",
+                        ]}
+                    >
+                        {data.map((i) => (
+                            <tr
+                                key={i.id}
+                                className="hover:bg-blue-50 cursor-pointer"
+                            >
+                                <td className="px-3 py-2 border">
+                                    {i.id_pesanan}
+                                </td>
+                                <td className="px-3 py-2 border">
+                                    {i.nama_pemesan}
+                                </td>
+                                <td className="px-3 py-2 border">
+                                    {i.produk.id_produk}
+                                </td>
+                                <td className="px-3 py-2 border">
+                                    {i.produk.nama_produk}
+                                </td>
+                                <td className="px-3 py-2 border text-center">
+                                    {i.jumlah_pesanan}
+                                </td>
+                                <td className="px-3 py-2 border text-end">
+                                    {i.produk.harga_produk}
+                                </td>
+                                <td className="px-3 py-2 border text-end">
+                                    {i.produk.harga_produk * i.jumlah_pesanan}
+                                </td>
+                            </tr>
+                        ))}
+                    </Table>
+                </div>
             </Navbar>
         </RoleAccess>
     );

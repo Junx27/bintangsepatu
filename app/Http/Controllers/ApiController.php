@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BahanBaku;
+use App\Models\DataLaporan;
 use App\Models\DataProduksi;
 use App\Models\LaporanPemesanan;
 use App\Models\LaporanProduksi;
@@ -43,12 +44,17 @@ class ApiController extends Controller
     }
     public function ProduksiDetail(String $id)
     {
-        $data = Produksi::findOrFail($id);
+        $data = Produksi::with('user:id,name')->findOrFail($id);
         return response()->json($data);
     }
     public function ProduksiAllProses()
     {
         $data = Produksi::where("status_produksi", "persiapan")->get();
+        return response()->json($data);
+    }
+    public function ProduksiAllVerified()
+    {
+        $data = Produksi::where("status_produksi", "diproses")->get();
         return response()->json($data);
     }
     public function bahanBakuAll()
@@ -63,7 +69,22 @@ class ApiController extends Controller
     }
     public function laporanProduksiAll()
     {
-        $data = LaporanProduksi::all();
+        $data = LaporanProduksi::with("produk:id,nama_produk")->where("status_produksi", "belum diverifikasi")->get();
+        return response()->json($data);
+    }
+    public function laporanProduksiAllVerified()
+    {
+        $data = LaporanProduksi::with("produk:id,nama_produk")->where("status_produksi", "diverifikasi")->where("status_pengiriman", "belum dikirim")->get();
+        return response()->json($data);
+    }
+    public function laporanProduksiAllVerifiedSuccess()
+    {
+        $data = LaporanProduksi::with("produk:id,nama_produk")->where("status_produksi", "diverifikasi")->where("status_pengiriman", "terkirim")->get();
+        return response()->json($data);
+    }
+    public function laporanProduksiDetail(String $id)
+    {
+        $data = LaporanProduksi::with("produk:id,nama_produk")->where("status_produksi", "diverifikasi")->findOrFail($id);
         return response()->json($data);
     }
     public function laporanPemesananAll()
@@ -78,7 +99,12 @@ class ApiController extends Controller
     }
     public function dataProduksiAll()
     {
-        $data = DataProduksi::with("bahan:id,id_bahan_baku,nama_bahan_baku,stok_bahan_baku")->get();
+        $data = DataProduksi::with("bahan:id,id_bahan_baku,nama_bahan_baku,stok_bahan_baku,harga_bahan_baku,satuan_bahan_baku")->get();
+        return response()->json($data);
+    }
+    public function dataLaporanProduksi()
+    {
+        $data = DataLaporan::with("bahan:id,id_bahan_baku,nama_bahan_baku,stok_bahan_baku,harga_bahan_baku,satuan_bahan_baku")->get();
         return response()->json($data);
     }
 }

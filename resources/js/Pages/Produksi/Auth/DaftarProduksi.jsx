@@ -105,14 +105,20 @@ function DaftarProduksi({ auth }) {
                 <div className="relative ml-12 text-sm flex gap-5 mr-5">
                     {!createProduksi && !tambahBahanBaku && (
                         <div className="w-[500px] h-screen border-r overflow-auto">
-                            <h1 className="font-bold sticky top-2 bg-white py-4 px-10 text-center mt-5 border-b uppercase z-20">
-                                daftar produk
-                            </h1>
-                            <div className="grid grid-cols-1 gap-5 mt-5 pb-20 p-5">
+                            <div className="text-sm flex gap-2 items-center border-b border-dashed pb-2 pt-10 mx-5">
+                                <Label
+                                    className={"bg-green-500"}
+                                    rotate={"rotate-90"}
+                                />
+                                <h1 className="font-bold">
+                                    Daftar produk tersedia
+                                </h1>
+                            </div>
+                            <div className="grid grid-cols-1 gap-5 pb-20 p-5">
                                 {dataProduk.map((i) => (
                                     <div
                                         key={i.id}
-                                        className="hover:bg-blue-50 cursor-pointer relative group shadow-lg rounded-xl p-5"
+                                        className="hover:border-pink-500 border border-dashed cursor-pointer relative group shadow-lg rounded-xl p-5"
                                     >
                                         <h1 className="font-black border-b border-dashed pb-2">
                                             ID: {i.id_produk}
@@ -399,18 +405,24 @@ function DaftarProduksi({ auth }) {
                             </div>
                         </div>
                     )}
-                    {dataProduksi.length === 0 ? (
-                        <div className="w-full">
-                            <Empty />
-                        </div>
-                    ) : (
-                        <div className="w-full mx-auto mt-5">
-                            {!tambahBahanBaku && (
+
+                    <div className="w-full mx-auto mt-5">
+                        {!tambahBahanBaku && (
+                            <div>
+                                <div className="text-sm mb-5 flex gap-2 items-center border-b border-dashed pb-2 pt-5 mx-5">
+                                    <Label
+                                        className={"bg-red-500"}
+                                        rotate={"rotate-90"}
+                                    />
+                                    <h1 className="font-bold">
+                                        Daftar rencana produksi
+                                    </h1>
+                                </div>
                                 <div className="grid grid-cols-3 gap-5 mt-5">
                                     {dataProduksi.map((i) => (
                                         <div
                                             key={i.id}
-                                            className="hover:bg-blue-50 cursor-pointer relative group shadow-lg rounded-xl p-5"
+                                            className="hover:border-pink-500 border border-dashed cursor-pointer relative group shadow-lg rounded-xl p-5"
                                         >
                                             <h1 className="font-black uppercase bg-yellow-500/20 text-center p-2 border border-dashed border-yellow-500 rounded-md mb-2">
                                                 {i.id_produksi}
@@ -471,18 +483,18 @@ function DaftarProduksi({ auth }) {
                                         </div>
                                     ))}
                                 </div>
-                            )}
-                            {tambahBahanBaku && (
-                                <div className="w-full h-screen">
-                                    <Test
-                                        dataBahanBaku={dataBahanBaku}
-                                        id={id}
-                                        userId={auth.user.id}
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    )}
+                            </div>
+                        )}
+                        {tambahBahanBaku && (
+                            <div className="w-full h-screen">
+                                <Test
+                                    dataBahanBaku={dataBahanBaku}
+                                    id={id}
+                                    userId={auth.user.id}
+                                />
+                            </div>
+                        )}
+                    </div>
                 </div>
             </Navbar>
         </RoleAccess>

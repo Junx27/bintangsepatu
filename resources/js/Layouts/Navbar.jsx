@@ -9,6 +9,11 @@ function Navbar({ children, navbar, title }) {
     const data = navbar;
     const [dataProduksi, setDataProduksi] = useState([]);
     const [dataPesanan, setDataPesanan] = useState([]);
+    const [dataVerification, setDataVerification] = useState([]);
+    const [dataUnVerification, setDataUnVerification] = useState([]);
+    const [dataLaporanProduksi, setDataLaporanProduksi] = useState([]);
+    const [dataBahanBaku, setDataBahanBaku] = useState([]);
+    const [dataInventory, setDataInventory] = useState([]);
 
     useEffect(() => {
         const fetchDataProduk = async () => {
@@ -17,10 +22,41 @@ function Navbar({ children, navbar, title }) {
             );
             setDataProduksi(response.data);
         };
+        const fetchDataVerify = async () => {
+            const response = await axios.get(
+                "/api/bintangsepatu/produksi-verification"
+            );
+            setDataVerification(response.data);
+        };
+        const fetchDataUnVerify = async () => {
+            const response = await axios.get(
+                "/api/bintangsepatu/laporan-produksis"
+            );
+            setDataUnVerification(response.data);
+        };
         const fetchDataPesanan = async () => {
             const response = await axios.get("/api/bintangsepatu/pesanans");
             setDataPesanan(response.data);
         };
+        const fetchDataProduksi = async () => {
+            const response = await axios.get(
+                "/api/bintangsepatu/laporan-produksis-verified"
+            );
+            setDataLaporanProduksi(response.data);
+        };
+        const fetchDataBahanBaku = async () => {
+            const response = await axios.get("/api/bintangsepatu/bahan-bakus");
+            setDataBahanBaku(response.data);
+        };
+        const fetchDataInventory = async () => {
+            const response = await axios.get("/api/bintangsepatu/produks");
+            setDataInventory(response.data);
+        };
+        fetchDataUnVerify();
+        fetchDataInventory();
+        fetchDataBahanBaku();
+        fetchDataProduksi();
+        fetchDataVerify();
         fetchDataPesanan();
         fetchDataProduk();
     }, []);
@@ -45,21 +81,36 @@ function Navbar({ children, navbar, title }) {
                         </h2>
                     </div>
                     <div className="flex gap-5 text-[8px]">
-                        <div className="flex flex-col items-center gap-2">
-                            <h1>All inventory price:</h1>
-                            <p className="text-green-500">Rp.170.000.000,00</p>
+                        <div className="flex flex-col items-center gap-2 bg-blue-500/20 p-2 rounded-md font-black w-20 border border-dashed border-blue-500">
+                            <h1>Produk:</h1>
+                            <p className="text-blue-500">
+                                {dataInventory.length}
+                            </p>
                         </div>
-                        <div className="flex flex-col items-center gap-2">
-                            <h1>All inventory stock:</h1>
-                            <p className="text-purple-500">488799</p>
+                        <div className="flex flex-col items-center gap-2 bg-purple-500/20 p-2 rounded-md font-black w-20 border border-dashed border-purple-500">
+                            <h1>Bahan Baku:</h1>
+                            <p className="text-purple-500">
+                                {dataBahanBaku.length}
+                            </p>
                         </div>
-                        <div className="flex flex-col items-center gap-2">
-                            <h1>Inventory In:</h1>
-                            <p className="text-blue-500">488799</p>
+                        <div className="flex flex-col items-center gap-2 bg-green-500/20 p-2 rounded-md font-black w-20 border border-dashed border-green-500">
+                            <h1>Verify:</h1>
+                            <p className="text-green-500">
+                                {dataLaporanProduksi.length}
+                            </p>
                         </div>
-                        <div className="flex flex-col items-center gap-2">
-                            <h1>Inventory Out:</h1>
-                            <p className="text-red-500">488799</p>
+                        <div className="flex flex-col items-center gap-2 bg-yellow-500/20 p-2 rounded-md font-black w-20 border border-dashed border-yellow-500">
+                            <h1>Unverify:</h1>
+                            <p className="text-red-500">
+                                {dataVerification.length +
+                                    dataUnVerification.length}
+                            </p>
+                        </div>
+                        <div className="flex flex-col items-center gap-2 bg-pink-500/20 p-2 rounded-md font-black w-20 border border-dashed border-red-500">
+                            <h1>Prepairing:</h1>
+                            <p className="text-red-500">
+                                {dataProduksi.length}
+                            </p>
                         </div>
                     </div>
                     <div className="flex gap-5 text-[7px]">
@@ -78,14 +129,6 @@ function Navbar({ children, navbar, title }) {
                                 className="w-4 h-4"
                             />
                             <h1>Status</h1>
-                        </div>
-                        <div className="flex flex-col items-center gap-1 hover:bg-yellow-300 p-2 rounded-md w-12">
-                            <img
-                                src="/assets/icons/stock.png"
-                                alt=""
-                                className="w-4 h-4"
-                            />
-                            <h1>Stok</h1>
                         </div>
                         <div className="flex flex-col items-center gap-1 hover:bg-yellow-300 p-2 rounded-md w-12">
                             <img
@@ -159,6 +202,16 @@ function Navbar({ children, navbar, title }) {
                                 nama={i.nama}
                                 parameter={"Lihat Pesanan"}
                                 data={dataPesanan}
+                            />
+                            <Notification
+                                nama={i.nama}
+                                parameter={"Buat Laporan"}
+                                data={dataVerification}
+                            />
+                            <Notification
+                                nama={i.nama}
+                                parameter={"Buat Laporan"}
+                                data={dataUnVerification}
                             />
                         </Link>
                     ))}

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer("stok_bahan_baku");
             $table->integer("minimum_stok");
             $table->string("satuan_bahan_baku");
-            $table->string("status_bahan_baku");
+            $table->integer("harga_bahan_baku");
             $table->foreignId("user_id")->constrained("users")->onDelete("cascade");
             $table->timestamps();
         });
