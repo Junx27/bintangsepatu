@@ -1,9 +1,9 @@
-import Navbar from "@/Layouts/Navbar";
 import RoleAccess from "@/Middleware/RoleAcces";
 import React, { useEffect, useState } from "react";
 import { navbarProduksi } from "../Data/NavbarProduksi";
 import Table from "@/Layouts/Tabel";
 import axios from "axios";
+import NavbarProduksi from "../Layouts/NavbarProduksi";
 
 function DaftarPesanan({ auth }) {
     const [data, setData] = useState([]);
@@ -17,7 +17,7 @@ function DaftarPesanan({ auth }) {
     }, []);
     return (
         <RoleAccess auth={auth} role={"produksi"}>
-            <Navbar navbar={navbarProduksi} title={"Daftar Pesanan"}>
+            <NavbarProduksi navbar={navbarProduksi} title={"Daftar Pesanan"}>
                 <div className="ml-12 mt-3">
                     <Table
                         header={[
@@ -60,7 +60,7 @@ function DaftarPesanan({ auth }) {
                         ))}
                     </Table>
                 </div>
-            </Navbar>
+            </NavbarProduksi>
         </RoleAccess>
     );
 }

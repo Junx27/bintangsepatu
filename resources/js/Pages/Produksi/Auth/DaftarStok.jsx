@@ -1,4 +1,3 @@
-import Navbar from "@/Layouts/Navbar";
 import RoleAccess from "@/Middleware/RoleAcces";
 import React, { useEffect, useState } from "react";
 import { navbarProduksi } from "../Data/NavbarProduksi";
@@ -9,6 +8,7 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import PopOver from "@/Components/PopOver";
 import Pagination from "@/Layouts/Pagination";
 import Label from "@/Components/Label";
+import NavbarProduksi from "../Layouts/NavbarProduksi";
 
 function DaftarStok({ auth }) {
     const [id, setId] = useState(null);
@@ -106,7 +106,7 @@ function DaftarStok({ auth }) {
                     </div>
                 </PopOver>
             )}
-            <Navbar navbar={navbarProduksi} title={"Daftar Stok"}>
+            <NavbarProduksi navbar={navbarProduksi} title={"Daftar Stok"}>
                 <div className="flex ml-12 pl-2 mt-2">
                     <div className="w-full relative">
                         <Table
@@ -293,7 +293,7 @@ function DaftarStok({ auth }) {
                         </form>
                     </div>
                 </div>
-            </Navbar>
+            </NavbarProduksi>
         </RoleAccess>
     );
 }

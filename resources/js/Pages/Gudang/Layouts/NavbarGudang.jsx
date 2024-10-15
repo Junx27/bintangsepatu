@@ -3,7 +3,7 @@ import { Head, Link, usePage } from "@inertiajs/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-function Navbar({ children, navbar, title }) {
+function NavbarGudang({ children, navbar, title }) {
     const { url } = usePage();
     const [open, setOpen] = useState(true);
     const data = navbar;
@@ -237,4 +237,4 @@ function Navbar({ children, navbar, title }) {
     );
 }
 
-export default Navbar;
+export default NavbarGudang;

@@ -1,4 +1,3 @@
-import Navbar from "@/Layouts/Navbar";
 import RoleAccess from "@/Middleware/RoleAcces";
 import React, { useEffect, useState } from "react";
 import { navbarProduksi } from "../Data/NavbarProduksi";
@@ -11,6 +10,7 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import CreateLaporan from "@/Pages/Produksi/Layouts/CreateLaporan";
 import FormaterRupiah from "@/Layouts/FormaterRupiah";
 import VerifikasiLaporan from "@/Pages/Produksi/Layouts/VerifikasiLaporan";
+import NavbarProduksi from "../Layouts/NavbarProduksi";
 
 function LaporanProduksi({ auth }) {
     const [dataProduksi, setDataProduksi] = useState([]);
@@ -103,7 +103,7 @@ function LaporanProduksi({ auth }) {
     );
     return (
         <RoleAccess auth={auth} role={"produksi"}>
-            <Navbar navbar={navbarProduksi} title={"Laporan Produksi"}>
+            <NavbarProduksi navbar={navbarProduksi} title={"Laporan Produksi"}>
                 <div className="mx-12 mt-5">
                     {createLaporanVerifikasi && (
                         <div className="ml-7 mt-5 mr-56">
@@ -477,7 +477,7 @@ function LaporanProduksi({ auth }) {
                         </div>
                     </div>
                 </div>
-            </Navbar>
+            </NavbarProduksi>
         </RoleAccess>
     );
 }

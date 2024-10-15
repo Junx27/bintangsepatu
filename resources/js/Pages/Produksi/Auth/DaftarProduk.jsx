@@ -1,4 +1,3 @@
-import Navbar from "@/Layouts/Navbar";
 import RoleAccess from "@/Middleware/RoleAcces";
 import React, { useEffect, useState } from "react";
 import { navbarProduksi } from "../Data/NavbarProduksi";
@@ -12,6 +11,7 @@ import PopOver from "@/Components/PopOver";
 import FormaterRupiah from "@/Layouts/FormaterRupiah";
 import Pagination from "@/Layouts/Pagination";
 import Label from "@/Components/Label";
+import NavbarProduksi from "../Layouts/NavbarProduksi";
 
 function DaftarProduk({ auth }) {
     const [id, setId] = useState(null);
@@ -118,7 +118,7 @@ function DaftarProduk({ auth }) {
                     </div>
                 </PopOver>
             )}
-            <Navbar navbar={navbarProduksi} title={"Daftar Produk"}>
+            <NavbarProduksi navbar={navbarProduksi} title={"Daftar Produk"}>
                 <div className="flex ml-12 pl-2 mt-2">
                     <div className="w-full relative">
                         <Table
@@ -490,7 +490,7 @@ function DaftarProduk({ auth }) {
                         </PopOver>
                     )}
                 </div>
-            </Navbar>
+            </NavbarProduksi>
         </RoleAccess>
     );
 }

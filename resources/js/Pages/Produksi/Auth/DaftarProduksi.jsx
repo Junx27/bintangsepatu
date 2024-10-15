@@ -1,4 +1,3 @@
-import Navbar from "@/Layouts/Navbar";
 import RoleAccess from "@/Middleware/RoleAcces";
 import React, { useEffect, useState } from "react";
 import { navbarProduksi } from "../Data/NavbarProduksi";
@@ -11,6 +10,7 @@ import InputError from "@/Components/InputError";
 import TextInput from "@/Components/TextInput";
 import PopOver from "@/Components/PopOver";
 import BahanBaku from "../Layouts/BahanBaku";
+import NavbarProduksi from "../Layouts/NavbarProduksi";
 
 function DaftarProduksi({ auth }) {
     const [id, setId] = useState(null);
@@ -87,7 +87,7 @@ function DaftarProduksi({ auth }) {
 
     return (
         <RoleAccess auth={auth} role={"produksi"}>
-            <Navbar navbar={navbarProduksi} title={"Daftar Produksi"}>
+            <NavbarProduksi navbar={navbarProduksi} title={"Daftar Produksi"}>
                 {errors.message && (
                     <PopOver>
                         <div className="flex flex-col items-center bg-white p-5 rounded w-96">
@@ -494,7 +494,7 @@ function DaftarProduksi({ auth }) {
                         )}
                     </div>
                 </div>
-            </Navbar>
+            </NavbarProduksi>
         </RoleAccess>
     );
 }

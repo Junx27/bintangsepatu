@@ -1,4 +1,3 @@
-import Navbar from "@/Layouts/Navbar";
 import RoleAccess from "@/Middleware/RoleAcces";
 import React, { useEffect, useState } from "react";
 import { navbarProduksi } from "../Data/NavbarProduksi";
@@ -13,6 +12,7 @@ import _ from "lodash";
 import HeaderLaporan from "@/Pages/Produksi/Layouts/HeaderLaporan";
 import PopOver from "@/Components/PopOver";
 import CreateProdukMasuk from "@/Pages/Produksi/Layouts/CreateProdukMasuk";
+import NavbarProduksi from "../Layouts/NavbarProduksi";
 
 function Dashboard({ auth }) {
     const [view, setView] = useState("diagram");
@@ -148,7 +148,10 @@ function Dashboard({ auth }) {
     };
     return (
         <RoleAccess auth={auth} role={"produksi"}>
-            <Navbar navbar={navbarProduksi} title={"Dashboard Produksi"}>
+            <NavbarProduksi
+                navbar={navbarProduksi}
+                title={"Dashboard Produksi"}
+            >
                 <div className="flex justify-between">
                     <div
                         className={`w-full m-10 ml-20 ${
@@ -777,7 +780,7 @@ function Dashboard({ auth }) {
                         </div>
                     </div>
                 </div>
-            </Navbar>
+            </NavbarProduksi>
         </RoleAccess>
     );
 }

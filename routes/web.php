@@ -27,12 +27,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get("/dashboard-penjualan", [PenjualanController::class, "dashboard"])->name('dashboard.penjualan');
 });
 
-Route::get("/welcome-gudang", [GudangController::class, "index"]);
-Route::get("/login-gudang", [GudangController::class, "login"]);
-Route::get("/register-gudang", [GudangController::class, "register"]);
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get("/dashboard-gudang", [GudangController::class, "dashboard"])->name('dashboard.gudang');
-});
+
 
 
 
@@ -58,3 +53,4 @@ Route::middleware('auth')->group(function () {
 require __DIR__ . '/auth.php';
 require __DIR__ . '/api.php';
 require __DIR__ . '/produksi.php';
+require __DIR__ . '/gudang.php';
