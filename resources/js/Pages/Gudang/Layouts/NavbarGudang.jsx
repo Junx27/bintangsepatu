@@ -1,9 +1,10 @@
+import DownloadPDF from "@/Components/DownloadPDF";
 import Notification from "@/Components/Notification";
 import { Head, Link, usePage } from "@inertiajs/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-function NavbarGudang({ children, navbar, title }) {
+function NavbarGudang({ children, navbar, title, pdfRef, fileName }) {
     const { url } = usePage();
     const [open, setOpen] = useState(true);
     const data = navbar;
@@ -131,12 +132,14 @@ function NavbarGudang({ children, navbar, title }) {
                             <h1>Status</h1>
                         </div>
                         <div className="flex flex-col items-center gap-1 hover:bg-yellow-300 p-2 rounded-md w-12">
-                            <img
-                                src="/assets/icons/printer.png"
-                                alt=""
-                                className="w-4 h-4"
-                            />
-                            <h1>Cetak</h1>
+                            <DownloadPDF pdfRef={pdfRef} fileName={fileName}>
+                                <img
+                                    src="/assets/icons/printer.png"
+                                    alt=""
+                                    className="w-4 h-4"
+                                />
+                                <h1>Cetak</h1>
+                            </DownloadPDF>
                         </div>
                         <div className="flex flex-col items-center gap-1 hover:bg-yellow-300 p-2 rounded-md w-12">
                             <img

@@ -23,4 +23,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get("/api/bintangsepatu/pengirimans", [ApiController::class, "pengirimanAll"]);
     Route::get("/api/bintangsepatu/data-produksis", [ApiController::class, "dataProduksiAll"]);
     Route::get("/api/bintangsepatu/data-laporan-produksis", [ApiController::class, "dataLaporanProduksi"]);
+
+    //api bagian gudang
+    Route::get("/api/bintangsepatu/data-produk-masuk-gudang", [ApiController::class, "dataProdukMasukGudang"]);
+    Route::get("/api/bintangsepatu/data-produk-masuk-gudang/{id}", [ApiController::class, "dataProdukMasukGudangDetail"]);
 });

@@ -124,18 +124,13 @@ class ProduksiController extends Controller
         if ($existingRecord) {
             return back()->withErrors(['message' => 'Data id produksi sudah ada, gagal menambahkan data produksi!, coba dengan id produk yang berbeda']);
         }
-        // $existingPending = Produksi::where('status_produksi', "persiapan")->first();
-
-        // if ($existingPending) {
-        //     return back()->withErrors(['message' => 'Data produksi belum selesai, gagal menambahkan data produksi!, coba dengan selsaikan proses produksi']);
-        // }
         Produksi::create($validated);
         return Inertia::location("/daftar-produksi-produksi");
     }
 
     public function createDataProduksi(Request $request)
     {
-        // Validasi input
+
         $validated = $request->validate([
             "produksi.*.stok_awal" => 'required|integer',
             "produksi.*.jumlah_bahan_baku" => 'required|integer',
@@ -144,17 +139,17 @@ class ProduksiController extends Controller
             "produksi.*.user_id" => "required|integer",
         ]);
 
-        // Loop melalui setiap entri produksi
+
         foreach ($validated['produksi'] as $produksi) {
-            // Simpan data produksi
+
             DataProduksi::create($produksi);
 
-            // Update stok produk berdasarkan ID produk
+
             $produk = BahanBaku::find($produksi['bahan_baku_id']);
             if ($produk) {
                 if ($produk->stok_bahan_baku >= $produksi['jumlah_bahan_baku']) {
-                    $produk->stok_bahan_baku -= $produksi['jumlah_bahan_baku']; // Kurangi stok
-                    $produk->save(); // Simpan perubahan
+                    $produk->stok_bahan_baku -= $produksi['jumlah_bahan_baku'];
+                    $produk->save();
                 } else {
                     return response()->json(['message' => 'Stok tidak cukup untuk produk ID ' . $produksi['produksi_id']], 400);
                 }
@@ -179,16 +174,16 @@ class ProduksiController extends Controller
             "produksi.*.user_id" => "required|integer",
         ]);
 
-        // Loop melalui setiap entri produksi
+
         foreach ($validated['produksi'] as $produksi) {
-            // Simpan data produksi
+
             DataLaporan::create($produksi);
 
-            // Update stok produk berdasarkan ID produk
+
             $produk = BahanBaku::find($produksi['bahan_baku_id']);
             if ($produk) {
-                $produk->stok_bahan_baku += $produksi['pemakaian_bahan_baku']; // Kurangi stok
-                $produk->save(); // Simpan perubahan
+                $produk->stok_bahan_baku += $produksi['pemakaian_bahan_baku'];
+                $produk->save();
             }
             $dataLaporan = LaporanProduksi::find($produksi['laporan_id']);
             if ($dataLaporan) {

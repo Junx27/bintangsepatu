@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BahanBaku;
 use App\Models\DataLaporan;
+use App\Models\DataProdukMasuk;
 use App\Models\DataProduksi;
 use App\Models\LaporanPemesanan;
 use App\Models\LaporanProduksi;
@@ -105,6 +106,19 @@ class ApiController extends Controller
     public function dataLaporanProduksi()
     {
         $data = DataLaporan::with("bahan:id,id_bahan_baku,nama_bahan_baku,stok_bahan_baku,harga_bahan_baku,satuan_bahan_baku")->get();
+        return response()->json($data);
+    }
+
+    // api bagian gudang
+
+    public function dataProdukMasukGudang()
+    {
+        $data = DataProdukMasuk::with("user:id,name")->with("produk:id,nama_produk")->get();
+        return response()->json($data);
+    }
+    public function dataProdukMasukGudangDetail(String $id)
+    {
+        $data = DataProdukMasuk::with("user:id,name")->with("produk:id,nama_produk")->findOrFail($id);
         return response()->json($data);
     }
 }
