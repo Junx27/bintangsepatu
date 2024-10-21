@@ -27,4 +27,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //api bagian gudang
     Route::get("/api/bintangsepatu/data-produk-masuk-gudang", [ApiController::class, "dataProdukMasukGudang"]);
     Route::get("/api/bintangsepatu/data-produk-masuk-gudang/{id}", [ApiController::class, "dataProdukMasukGudangDetail"]);
+    Route::get("/api/bintangsepatu/data-bahan-baku-masuk-gudang", [ApiController::class, "dataBahanBakuMasuk"]);
 });

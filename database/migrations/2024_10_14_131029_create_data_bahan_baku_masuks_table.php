@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string("id_bahan_baku");
             $table->integer("jumlah_bahan_baku_masuk");
+            $table->string("tanggal_masuk");
             $table->foreignId("bahan_baku_id")->constrained("bahan_bakus")->onDelete("cascade");
             $table->foreignId("user_id")->constrained("users")->onDelete("cascade");
             $table->timestamps();

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\BahanBaku;
+use App\Models\DataBahanBakuMasuk;
 use App\Models\DataProdukMasuk;
 use App\Models\Produk;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use PhpParser\Node\Expr\Cast\String_;
 
@@ -106,6 +108,46 @@ class GudangController extends Controller
 
         BahanBaku::create($validated);
         return Inertia::location("/bahan-baku-gudang");
-        // dd($request->all());
+    }
+    public function updateBahanBaku(Request $request, String $id)
+    {
+        $validated = $request->validate([
+            "id_bahan_baku" => "required",
+            "nama_bahan_baku" => "required",
+            "satuan_bahan_baku" => "required",
+            "harga_bahan_baku" => "required",
+            "minimum_stok" => "required",
+
+        ]);
+        $bahanBaku = BahanBaku::findOrFail($id);
+        $bahanBaku->update($validated);
+        return Inertia::location("/bahan-baku-gudang");
+    }
+    public function updateStokBahanBaku(Request $request, String $id)
+    {
+        $validated = $request->validate([
+            "stok_masuk" => "required",
+            'tanggal_masuk' => "required",
+
+        ]);
+        $bahanBaku = BahanBaku::findOrFail($id);
+        $bahanBaku->stok_bahan_baku += $validated["stok_masuk"];
+        $bahanBaku->save();
+        $userId = Auth::id();
+        DataBahanBakuMasuk::create([
+            'id_bahan_baku' => $bahanBaku->id_bahan_baku,
+            'jumlah_bahan_baku_masuk' => $validated["stok_masuk"],
+            'tanggal_masuk' => $validated["tanggal_masuk"],
+            'bahan_baku_id' => $bahanBaku->id,
+            'user_id' => $userId,
+        ]);
+        return Inertia::location("/bahan-baku-gudang");
+    }
+
+    public function deleteBahanBaku(String $id)
+    {
+        $bahanBaku = BahanBaku::findOrFail($id);
+        $bahanBaku->delete();
+        return Inertia::location("/bahan-baku-gudang");
     }
 }

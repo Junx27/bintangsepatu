@@ -13,6 +13,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get("/pesan-masuk-gudang", [GudangController::class, "pesanMasuk"])->name('pesan.masuk.gudang');
     Route::get("/bahan-baku-gudang", [GudangController::class, "bahanBaku"])->name('bahan.baku.gudang');
     Route::post("/bahan-baku-gudang", [GudangController::class, "createBahanBaku"])->name('create.bahan.baku.gudang');
+    Route::put("/bahan-baku-gudang/{id}", [GudangController::class, "updateBahanBaku"])->name('update.bahan.baku.gudang');
+    Route::put("/bahan-baku-gudang-stok/{id}", [GudangController::class, "updateStokBahanBaku"])->name('update.stok.bahan.baku.gudang');
+    Route::delete("/bahan-baku-gudang/{id}", [GudangController::class, "deleteBahanBaku"])->name('delete.bahan.baku.gudang');
     Route::get("/laporan-gudang", [GudangController::class, "laporanGudang"])->name('laporan.gudang');
     Route::put("/laporan-gudang/{id}", [GudangController::class, "laporanGudangUpdate"])->name('update.laporan.gudang');
     Route::put("/laporan-gudang-edit/{id}", [GudangController::class, "laporanGudangUpdateEdit"])->name('update.edit.laporan.gudang');

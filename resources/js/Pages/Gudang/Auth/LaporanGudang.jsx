@@ -8,7 +8,7 @@ import Label from "@/Components/Label";
 
 function LaporanGudang({ auth }) {
     const pdfRef = useRef();
-    const [view, setView] = useState("produk");
+    const [view, setView] = useState("laporan produk masuk");
     return (
         <RoleAccess auth={auth} role={"gudang"}>
             <NavbarGudang
@@ -24,33 +24,35 @@ function LaporanGudang({ auth }) {
                                 className={"bg-green-500"}
                                 rotate={"rotate-90"}
                             />
-                            <h1 className="font-bold">Daftar laporan gudang</h1>
-                        </div>
-                        <div className="mb-5 flex uppercase gap-5 text-[10px]">
-                            <p
-                                className={`cursor-pointer w-20 text-center p-1 rounded-md border border-dashed border-green-500 hover:text-green-500 ${
-                                    view === "produk"
-                                        ? "text-green-500 bg-green-500/20 font-bold"
-                                        : ""
-                                }`}
-                                onClick={() => setView("produk")}
-                            >
-                                Produk
-                            </p>
-                            <p
-                                className={`cursor-pointer w-20 text-center p-1 rounded-md border border-dashed border-green-500 hover:text-green-500 ${
-                                    view === "bahan baku"
-                                        ? "text-green-500 bg-green-500/20 font-bold"
-                                        : ""
-                                }`}
-                                onClick={() => setView("bahan baku")}
-                            >
-                                Bahan Baku
-                            </p>
+                            {[
+                                "laporan produk masuk",
+                                "laporan produk keluar",
+                                "laporan bahan baku masuk",
+                                "laporan bahan baku keluar",
+                            ].map((item) => (
+                                <p
+                                    key={item}
+                                    className={`cursor-pointer mr-5 text-center hover:text-[#0C15F7] ${
+                                        view === item ? "text-[#0C15F7]" : ""
+                                    }`}
+                                    onClick={() => setView(item)}
+                                >
+                                    {item.charAt(0).toUpperCase() +
+                                        item.slice(1)}
+                                </p>
+                            ))}
                         </div>
                     </div>
-                    {view === "produk" ? (
-                        <div ref={pdfRef} className="pb-64 px-5">
+                    {view === "laporan produk masuk" ? (
+                        <div ref={pdfRef} className="">
+                            <LaporanProdukMasuk />
+                        </div>
+                    ) : view === "laporan produk keluar" ? (
+                        <div ref={pdfRef}>
+                            <LaporanBahanBaku />
+                        </div>
+                    ) : view === "laporan bahan baku masuk" ? (
+                        <div ref={pdfRef} className="">
                             <LaporanProdukMasuk />
                         </div>
                     ) : (

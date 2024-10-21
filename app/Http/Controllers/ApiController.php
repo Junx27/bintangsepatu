@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BahanBaku;
+use App\Models\DataBahanBakuMasuk;
 use App\Models\DataLaporan;
 use App\Models\DataProdukMasuk;
 use App\Models\DataProduksi;
@@ -119,6 +120,11 @@ class ApiController extends Controller
     public function dataProdukMasukGudangDetail(String $id)
     {
         $data = DataProdukMasuk::with("user:id,name")->with("produk:id,nama_produk")->findOrFail($id);
+        return response()->json($data);
+    }
+    public function dataBahanBakuMasuk()
+    {
+        $data = DataBahanBakuMasuk::all();
         return response()->json($data);
     }
 }
