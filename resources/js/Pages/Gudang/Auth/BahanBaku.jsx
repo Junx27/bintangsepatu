@@ -15,6 +15,20 @@ import Table from "@/Layouts/Tabel";
 import axios from "axios";
 
 function BahanBaku({ auth }) {
+    const navigasi = [
+        {
+            nama: "daftar bahan baku",
+            icon: "/assets/icons/product.png",
+        },
+        {
+            nama: "tambah bahan baku",
+            icon: "/assets/icons/add-product.png",
+        },
+        {
+            nama: "update stok bahan baku",
+            icon: "/assets/icons/stock.png",
+        },
+    ];
     const [view, setView] = useState("daftar bahan baku");
     const [openEditBahanBaku, setOpenEditBahanBaku] = useState(false);
     const [openUpdateBahanBaku, setOpenUpdateBahanBaku] = useState(false);
@@ -133,263 +147,243 @@ function BahanBaku({ auth }) {
             )}
 
             <NavbarGudang navbar={navbarGudang} title={"Bahan Baku"}>
-                {openUpdateBahanBaku && (
-                    <PopOver>
-                        <div className="flex justify-end">
-                            <p
-                                className="bg-yellow-300 p-2 rounded-md w-7 cursor-pointer"
-                                onClick={() => setOpenEditBahanBaku(false)}
-                            >
-                                <img
-                                    src="/assets/icons/plus.png"
-                                    alt=""
-                                    className="w-3 h-3 rotate-45"
-                                />
-                            </p>
-                        </div>
-                        <div className="flex flex-col items-center bg-white p-5 rounded w-96">
-                            <form
-                                onSubmit={handleUpdateStok}
-                                className="w-96 mx-auto p-5 border border-dashed border-pink-500 rounded-lg"
-                            >
-                                <div className="flex gap-2 items-center font-bold border-b border-dashed pb-3">
-                                    <Label
-                                        className={"bg-green-500"}
-                                        rotate={"rotate-90"}
-                                    />
-                                    <p>Mengubah bahan baku</p>
-                                </div>
-                                {["stok_masuk", "tanggal_masuk"].map(
-                                    (field) => (
-                                        <div className="my-3" key={field}>
-                                            <InputLabel
-                                                htmlFor={field}
-                                                value={field.replace(/_/g, " ")}
-                                            />
-                                            <TextInput
-                                                id={field}
-                                                type={
-                                                    field === "stok_masuk"
-                                                        ? "number"
-                                                        : "date"
-                                                }
-                                                name={field}
-                                                value={data[field]}
-                                                className="mt-1 block w-full"
-                                                autoComplete={field}
-                                                onChange={handleChange}
-                                            />
-                                            <InputError
-                                                message={errors[field]}
-                                                className="mt-2"
-                                            />
-                                        </div>
-                                    )
-                                )}
-                                <div className="flex justify-end mt-5">
-                                    <PrimaryButton>update stok</PrimaryButton>
-                                </div>
-                            </form>
-                        </div>
-                    </PopOver>
-                )}
-                {openEditBahanBaku && (
-                    <PopOver>
-                        <div className="flex justify-end">
-                            <p
-                                className="bg-yellow-300 p-2 rounded-md w-7 cursor-pointer"
-                                onClick={() => setOpenEditBahanBaku(false)}
-                            >
-                                <img
-                                    src="/assets/icons/plus.png"
-                                    alt=""
-                                    className="w-3 h-3 rotate-45"
-                                />
-                            </p>
-                        </div>
-                        <div className="flex flex-col items-center bg-white p-5 rounded w-96">
-                            <form
-                                onSubmit={handleUpdate}
-                                className="w-96 mx-auto p-5 border border-dashed border-pink-500 rounded-lg"
-                            >
-                                <div className="flex gap-2 items-center font-bold border-b border-dashed pb-3">
-                                    <Label
-                                        className={"bg-green-500"}
-                                        rotate={"rotate-90"}
-                                    />
-                                    <p>Mengubah bahan baku</p>
-                                </div>
-                                {[
-                                    "id_bahan_baku",
-                                    "nama_bahan_baku",
-                                    "satuan_bahan_baku",
-                                    "harga_bahan_baku",
-                                    "minimum_stok",
-                                ].map((field) => (
-                                    <div className="my-3" key={field}>
-                                        <InputLabel
-                                            htmlFor={field}
-                                            value={field.replace(/_/g, " ")}
-                                        />
-                                        <TextInput
-                                            id={field}
-                                            type={
-                                                field === "harga_bahan_baku" ||
-                                                field === "minimum_stok"
-                                                    ? "number"
-                                                    : "text"
-                                            }
-                                            name={field}
-                                            value={data[field]}
-                                            className="mt-1 block w-full"
-                                            autoComplete={field}
-                                            onChange={handleChange}
-                                        />
-                                        <InputError
-                                            message={errors[field]}
-                                            className="mt-2"
-                                        />
-                                    </div>
-                                ))}
-                                <div className="flex justify-end mt-5">
-                                    <PrimaryButton>Simpan</PrimaryButton>
-                                </div>
-                            </form>
-                        </div>
-                    </PopOver>
-                )}
                 {sukses && (
                     <NotificationSuccess message={"berhasil memasukan data"} />
                 )}
                 <div className="ml-20 mt-10 mr-5">
-                    <div className="text-sm mb-5 flex gap-2 items-center border-b border-dashed pb-2">
+                    <div className="text-sm mb-5 flex gap-2 items-center">
                         <Label
-                            className={"bg-green-500"}
+                            className={"bg-[#0C15F7]"}
                             rotate={"rotate-90"}
                         />
-                        {[
-                            "daftar bahan baku",
-                            "tambah bahan baku",
-                            "bahan baku masuk",
-                        ].map((item) => (
-                            <p
+                        {navigasi.map((item) => (
+                            <div
                                 key={item}
-                                className={`cursor-pointer mr-5 text-center hover:text-[#0C15F7] ${
-                                    view === item ? "text-[#0C15F7]" : ""
+                                className={`relative text-[8px] p-2 rounded-md cursor-pointer mr-5 text-center hover:bg-yellow-300 ${
+                                    view === item.nama ? "bg-yellow-300" : ""
                                 }`}
-                                onClick={() => setView(item)}
+                                onClick={() => setView(item.nama)}
                             >
-                                {item.charAt(0).toUpperCase() + item.slice(1)}
-                            </p>
+                                <div className="flex flex-row gap-2 items-center">
+                                    <img
+                                        src={item.icon}
+                                        alt=""
+                                        className="w-4 h-4"
+                                    />
+                                    <p className="">
+                                        {item.nama.charAt(0).toUpperCase() +
+                                            item.nama.slice(1)}
+                                    </p>
+                                </div>
+                            </div>
                         ))}
                     </div>
 
                     {view === "daftar bahan baku" ? (
-                        <div className="w-full relative ">
-                            <div className="grid grid-cols-4 gap-5 mr-5 pb-32">
-                                {dataBahanBaku.map((bahanBaku) => (
-                                    <div
-                                        key={bahanBaku.id}
-                                        className={`group hover:border-pink-500 border border-dashed p-5 cursor-pointer rounded-md shadow-lg relative `}
-                                    >
-                                        <h1 className="font-black border-b border-dashed pb-2">
-                                            {bahanBaku.id_bahan_baku}
-                                        </h1>
-                                        <div>
-                                            <Label
-                                                className={
-                                                    bahanBaku.stok_produk >
-                                                    bahanBaku.stok_minimum_produk
-                                                        ? "bg-green-600"
-                                                        : bahanBaku.stok_produk ===
-                                                          bahanBaku.stok_minimum_produk
-                                                        ? "bg-purple-500"
-                                                        : "bg-red-600"
-                                                }
-                                            />
-                                            <div className="flex justify-between items-center">
-                                                <div>
-                                                    <p className="capitalize">
-                                                        {
-                                                            bahanBaku.nama_bahan_baku
+                        <div>
+                            {openEditBahanBaku && (
+                                <div className="">
+                                    <div className="flex flex-col items-center bg-white p-5 rounded w-96">
+                                        <form
+                                            onSubmit={handleUpdate}
+                                            className="w-96 p-5 border border-dashed border-pink-500 rounded-lg"
+                                        >
+                                            <div className="flex justify-between gap-2 items-center font-bold border-b border-dashed pb-3">
+                                                <div className="flex gap-2 items-center">
+                                                    <Label
+                                                        className={
+                                                            "bg-green-500"
                                                         }
-                                                        <span
-                                                            className={`relative ml-3 rounded-full text-center p-1 text-[10px] font-normal pl-5 pr-3 ${
-                                                                bahanBaku.stok_bahan_baku >
-                                                                bahanBaku.minimum_stok
-                                                                    ? "bg-green-500/20 text-green-600"
-                                                                    : bahanBaku.stok_bahan_baku ===
-                                                                      bahanBaku.minimum_stok
-                                                                    ? "bg-purple-500/20 text-purple-500"
-                                                                    : "bg-red-500/20 text-red-600"
-                                                            }`}
-                                                        >
-                                                            {bahanBaku.stok_bahan_baku >
-                                                            bahanBaku.minimum_stok
-                                                                ? "+aman"
-                                                                : bahanBaku.stok_bahan_baku ===
-                                                                  bahanBaku.minimum_stok
-                                                                ? "+cukup"
-                                                                : "-kurang"}
-                                                            <span
-                                                                className={`inset-0 absolute w-2 h-2 top-[6px] left-1 rounded-full animate-pulse ${
-                                                                    bahanBaku.stok_bahan_baku >
-                                                                    bahanBaku.minimum_stok
-                                                                        ? "bg-green-500"
-                                                                        : bahanBaku.stok_bahan_baku ===
-                                                                          bahanBaku.minimum_stok
-                                                                        ? "bg-purple-500"
-                                                                        : "bg-red-500"
-                                                                }`}
-                                                            ></span>
-                                                        </span>
+                                                        rotate={"rotate-90"}
+                                                    />
+                                                    <p>Mengubah bahan baku</p>
+                                                </div>
+                                                <div className="flex justify-end">
+                                                    <p
+                                                        className="bg-yellow-300 p-2 rounded-md w-7 cursor-pointer"
+                                                        onClick={() =>
+                                                            setOpenEditBahanBaku(
+                                                                false
+                                                            )
+                                                        }
+                                                    >
+                                                        <img
+                                                            src="/assets/icons/plus.png"
+                                                            alt=""
+                                                            className="w-3 h-3 rotate-45"
+                                                        />
                                                     </p>
-                                                    <p className="text-xs mt-2"></p>
                                                 </div>
                                             </div>
-                                            <div className="flex justify-between text-xs">
-                                                <p>
-                                                    Stok bahan baku: <br />
-                                                    {bahanBaku.stok_bahan_baku}
-                                                </p>
-                                                <p>
-                                                    Minimum stok: <br />
-                                                    {bahanBaku.minimum_stok}
-                                                </p>
+                                            {[
+                                                "id_bahan_baku",
+                                                "nama_bahan_baku",
+                                                "satuan_bahan_baku",
+                                                "harga_bahan_baku",
+                                                "minimum_stok",
+                                            ].map((field) => (
+                                                <div
+                                                    className="my-3"
+                                                    key={field}
+                                                >
+                                                    <InputLabel
+                                                        htmlFor={field}
+                                                        value={field.replace(
+                                                            /_/g,
+                                                            " "
+                                                        )}
+                                                    />
+                                                    <TextInput
+                                                        id={field}
+                                                        type={
+                                                            field ===
+                                                                "harga_bahan_baku" ||
+                                                            field ===
+                                                                "minimum_stok"
+                                                                ? "number"
+                                                                : "text"
+                                                        }
+                                                        name={field}
+                                                        value={data[field]}
+                                                        className="mt-1 block w-full"
+                                                        autoComplete={field}
+                                                        onChange={handleChange}
+                                                    />
+                                                    <InputError
+                                                        message={errors[field]}
+                                                        className="mt-2"
+                                                    />
+                                                </div>
+                                            ))}
+                                            <div className="flex justify-end mt-5">
+                                                <PrimaryButton>
+                                                    Simpan
+                                                </PrimaryButton>
                                             </div>
-                                        </div>
-                                        <div className="group-hover:block hidden absolute z-20 top-2 right-2 cursor-pointer">
-                                            <div className="flex gap-2">
-                                                <img
-                                                    src="/assets/icons/edit-button.png"
-                                                    alt=""
-                                                    className="w-7 h-7"
-                                                    onClick={() =>
-                                                        handleEditBahanBaku(
-                                                            bahanBaku.id
-                                                        )
-                                                    }
-                                                />
-                                                <img
-                                                    src="/assets/icons/remove.png"
-                                                    alt=""
-                                                    className="w-7 h-7"
-                                                    onClick={() =>
-                                                        handleDeleteBahanBaku(
-                                                            bahanBaku.id
-                                                        )
-                                                    }
-                                                />
-                                            </div>
-                                        </div>
+                                        </form>
                                     </div>
-                                ))}
+                                </div>
+                            )}
+
+                            <div
+                                className={`w-full relative h-screen overflow-auto pb-32 ${
+                                    openEditBahanBaku ? "hidden" : "block"
+                                }`}
+                            >
+                                <div className="grid grid-cols-5 gap-5 mr-5 pb-32">
+                                    {dataBahanBaku.map((bahanBaku) => (
+                                        <div
+                                            key={bahanBaku.id}
+                                            className={`group hover:border-pink-500 border border-dashed p-5 cursor-pointer rounded-md shadow-lg relative `}
+                                        >
+                                            <div className="w-full h-32">
+                                                <img
+                                                    src="https://inti-mesh.com/wp-content/uploads/2023/03/Raja-paku-1-1024x768.jpg"
+                                                    alt=""
+                                                    className="w-full h-full object-cover rounded-lg"
+                                                />
+                                            </div>
+                                            <h1 className="font-black border-b border-dashed pb-2 mt-2">
+                                                {bahanBaku.id_bahan_baku}
+                                            </h1>
+                                            <div>
+                                                <Label
+                                                    className={
+                                                        bahanBaku.stok_produk >
+                                                        bahanBaku.stok_minimum_produk
+                                                            ? "bg-green-600"
+                                                            : bahanBaku.stok_produk ===
+                                                              bahanBaku.stok_minimum_produk
+                                                            ? "bg-purple-500"
+                                                            : "bg-red-600"
+                                                    }
+                                                />
+                                                <div className="flex justify-between items-center">
+                                                    <div>
+                                                        <p className="capitalize">
+                                                            {
+                                                                bahanBaku.nama_bahan_baku
+                                                            }
+                                                            <span
+                                                                className={`relative ml-3 rounded-full text-center p-1 text-[10px] font-normal pl-5 pr-3 ${
+                                                                    bahanBaku.stok_bahan_baku >
+                                                                    bahanBaku.minimum_stok
+                                                                        ? "bg-green-500/20 text-green-600"
+                                                                        : bahanBaku.stok_bahan_baku ===
+                                                                          bahanBaku.minimum_stok
+                                                                        ? "bg-purple-500/20 text-purple-500"
+                                                                        : "bg-red-500/20 text-red-600"
+                                                                }`}
+                                                            >
+                                                                {bahanBaku.stok_bahan_baku >
+                                                                bahanBaku.minimum_stok
+                                                                    ? "+aman"
+                                                                    : bahanBaku.stok_bahan_baku ===
+                                                                      bahanBaku.minimum_stok
+                                                                    ? "+cukup"
+                                                                    : "-kurang"}
+                                                                <span
+                                                                    className={`inset-0 absolute w-2 h-2 top-[6px] left-1 rounded-full animate-pulse ${
+                                                                        bahanBaku.stok_bahan_baku >
+                                                                        bahanBaku.minimum_stok
+                                                                            ? "bg-green-500"
+                                                                            : bahanBaku.stok_bahan_baku ===
+                                                                              bahanBaku.minimum_stok
+                                                                            ? "bg-purple-500"
+                                                                            : "bg-red-500"
+                                                                    }`}
+                                                                ></span>
+                                                            </span>
+                                                        </p>
+                                                        <p className="text-xs mt-2"></p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex justify-between text-xs">
+                                                    <p>
+                                                        Stok bahan baku: <br />
+                                                        {
+                                                            bahanBaku.stok_bahan_baku
+                                                        }
+                                                    </p>
+                                                    <p>
+                                                        Minimum stok: <br />
+                                                        {bahanBaku.minimum_stok}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="group-hover:block hidden absolute z-20 bottom-20 mb-6 right-5 cursor-pointer">
+                                                <div className="flex gap-2">
+                                                    <img
+                                                        src="/assets/icons/edit-button.png"
+                                                        alt=""
+                                                        className="w-5 h-5"
+                                                        onClick={() =>
+                                                            handleEditBahanBaku(
+                                                                bahanBaku.id
+                                                            )
+                                                        }
+                                                    />
+                                                    <img
+                                                        src="/assets/icons/remove.png"
+                                                        alt=""
+                                                        className="w-5 h-5"
+                                                        onClick={() =>
+                                                            handleDeleteBahanBaku(
+                                                                bahanBaku.id
+                                                            )
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     ) : view === "tambah bahan baku" ? (
                         <form
                             onSubmit={handleSubmit}
-                            className="w-96 mx-auto p-5 border border-dashed border-pink-500 rounded-lg"
+                            className="w-96 p-5 border border-dashed border-pink-500 rounded-lg"
                         >
                             <div className="flex gap-2 items-center font-bold border-b border-dashed pb-3">
                                 <Label
@@ -435,14 +429,105 @@ function BahanBaku({ auth }) {
                             </div>
                         </form>
                     ) : (
-                        <div>
-                            <div className="grid grid-cols-4 gap-5 mr-5 pb-32">
+                        <div className="w-full h-screen overflow-auto pb-32">
+                            {openUpdateBahanBaku && (
+                                <div>
+                                    <div className="flex flex-col items-center bg-white p-5 rounded w-96">
+                                        <form
+                                            onSubmit={handleUpdateStok}
+                                            className="w-96 mx-auto p-5 border border-dashed border-pink-500 rounded-lg"
+                                        >
+                                            <div className="flex justify-between gap-2 items-center font-bold border-b border-dashed pb-3">
+                                                <div className="flex gap-2 items-center">
+                                                    <h1 className="font-black mt-1">
+                                                        ID: {data.id_bahan_baku}
+                                                    </h1>
+                                                </div>
+                                                <div className="flex justify-end">
+                                                    <p
+                                                        className="bg-yellow-300 p-2 rounded-md w-7 cursor-pointer"
+                                                        onClick={() =>
+                                                            setOpenUpdateBahanBaku(
+                                                                false
+                                                            )
+                                                        }
+                                                    >
+                                                        <img
+                                                            src="/assets/icons/plus.png"
+                                                            alt=""
+                                                            className="w-3 h-3 rotate-45"
+                                                        />
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <Label
+                                                    className={"bg-green-500"}
+                                                />
+                                                {data.nama_bahan_baku}
+                                            </div>
+                                            {[
+                                                "stok_masuk",
+                                                "tanggal_masuk",
+                                            ].map((field) => (
+                                                <div
+                                                    className="my-3"
+                                                    key={field}
+                                                >
+                                                    <InputLabel
+                                                        htmlFor={field}
+                                                        value={field.replace(
+                                                            /_/g,
+                                                            " "
+                                                        )}
+                                                    />
+                                                    <TextInput
+                                                        id={field}
+                                                        type={
+                                                            field ===
+                                                            "stok_masuk"
+                                                                ? "number"
+                                                                : "date"
+                                                        }
+                                                        name={field}
+                                                        value={data[field]}
+                                                        className="mt-1 block w-full"
+                                                        autoComplete={field}
+                                                        onChange={handleChange}
+                                                    />
+                                                    <InputError
+                                                        message={errors[field]}
+                                                        className="mt-2"
+                                                    />
+                                                </div>
+                                            ))}
+                                            <div className="flex justify-end mt-5">
+                                                <PrimaryButton>
+                                                    update stok
+                                                </PrimaryButton>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            )}
+                            <div
+                                className={`grid grid-cols-5 gap-5 mr-5 pb-32 ${
+                                    openUpdateBahanBaku ? "hidden" : "block"
+                                }`}
+                            >
                                 {dataBahanBaku.map((bahanBaku) => (
                                     <div
                                         key={bahanBaku.id}
                                         className={`group hover:border-pink-500 border border-dashed p-5 cursor-pointer rounded-md shadow-lg relative `}
                                     >
-                                        <h1 className="font-black border-b border-dashed pb-2">
+                                        <div className="w-full h-32">
+                                            <img
+                                                src="https://inti-mesh.com/wp-content/uploads/2023/03/Raja-paku-1-1024x768.jpg"
+                                                alt=""
+                                                className="w-full h-full object-cover rounded-lg"
+                                            />
+                                        </div>
+                                        <h1 className="font-black border-b border-dashed pb-2 mt-2">
                                             {bahanBaku.id_bahan_baku}
                                         </h1>
                                         <div>
@@ -509,7 +594,7 @@ function BahanBaku({ auth }) {
                                             </div>
                                         </div>
                                         <div
-                                            className="group-hover:visible invisible absolute z-20 top-2 right-2 cursor-pointer"
+                                            className="group-hover:visible invisible absolute z-20 bottom-20 mb-6 right-5 cursor-pointer"
                                             onClick={() =>
                                                 handleUpdateStokBahanBaku(
                                                     bahanBaku.id
@@ -519,7 +604,7 @@ function BahanBaku({ auth }) {
                                             <img
                                                 src="/assets/icons/plus.png"
                                                 alt=""
-                                                className="w-7 h-7 bg-green-300 p-2 rounded-md"
+                                                className="w-6 h-6 bg-green-300 p-2 rounded-md"
                                             />
                                         </div>
                                     </div>

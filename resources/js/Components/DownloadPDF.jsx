@@ -1,12 +1,12 @@
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
-const DownloadPDF = ({ pdfRef, fileName, children }) => {
+const DownloadPDF = ({ pdfRef, fileName, children, layout }) => {
     const downloadPDF = () => {
         const input = pdfRef.current;
         html2canvas(input).then((canvas) => {
             const imgData = canvas.toDataURL("image/png");
-            const pdf = new jsPDF("p", "mm", "a4", true);
+            const pdf = new jsPDF(layout, "mm", "a4", true);
             const pdfWidth = pdf.internal.pageSize.getWidth();
             const pdfHeight = pdf.internal.pageSize.getHeight();
             const imgWidth = canvas.width;

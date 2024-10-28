@@ -4,7 +4,7 @@ import { Head, Link, usePage } from "@inertiajs/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-function NavbarGudang({ children, navbar, title, pdfRef, fileName }) {
+function NavbarGudang({ children, navbar, title, pdfRef, fileName, layout }) {
     const { url } = usePage();
     const [open, setOpen] = useState(true);
     const data = navbar;
@@ -132,13 +132,17 @@ function NavbarGudang({ children, navbar, title, pdfRef, fileName }) {
                             <h1>Status</h1>
                         </div>
                         <div className="flex flex-col items-center gap-1 hover:bg-yellow-300 p-2 rounded-md w-12">
-                            <DownloadPDF pdfRef={pdfRef} fileName={fileName}>
+                            <DownloadPDF
+                                pdfRef={pdfRef}
+                                fileName={fileName}
+                                layout={layout}
+                            >
                                 <img
                                     src="/assets/icons/printer.png"
                                     alt=""
                                     className="w-4 h-4"
                                 />
-                                <h1>Cetak</h1>
+                                <h1 className="mt-1">Cetak</h1>
                             </DownloadPDF>
                         </div>
                         <div className="flex flex-col items-center gap-1 hover:bg-yellow-300 p-2 rounded-md w-12">

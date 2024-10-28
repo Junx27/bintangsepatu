@@ -1,57 +1,38 @@
-import FormateDate from "@/Components/FormateDate";
+import FormaterRupiah from "@/Layouts/FormaterRupiah";
 import Table from "@/Layouts/Tabel";
 import React, { useEffect, useState } from "react";
 
-function LaporanBahanBaku() {
-    const tanggal = new Date();
+function LaporanStokBahanBaku() {
     const [dataBahanBaku, setDataBahanBaku] = useState([]);
+
     useEffect(() => {
         const fetchData = async () => {
-            try {
-                const response = await axios.get(
-                    "/api/bintangsepatu/bahan-bakus"
-                );
-                setDataBahanBaku(response.data);
-            } catch (error) {
-                console.error("Failed to fetch data", error);
-            }
+            const response = await axios.get("/api/bintangsepatu/bahan-bakus");
+            setDataBahanBaku(response.data);
         };
+
         fetchData();
     }, []);
     return (
-        <div className="">
-            <div className="relative mb-10 border-b-4 border-black border-double pb-3">
-                <div className="absolute top-2">
-                    <img src="/assets/logo.png" alt="" className="w-8 h-8" />
-                </div>
-                <h1 className="font-black uppercase text-center text-xl">
-                    laporan bagian gudang
-                </h1>
-                <h2 className="text-center font-bold text-sm">
-                    Sistem Informasi Inventori dan Produksi (SIIP)
-                </h2>
-                <h2 className="text-center font-bold text-sm">
-                    NOMOR: LAG-001/01/LAP-001/LAP-014
-                </h2>
-                <p className="absolute top-2 right-5 text-xs">
-                    <FormateDate data={tanggal} />
-                </p>
-            </div>
+        <div className="pb-32">
             <Table
                 header={[
+                    "no",
                     "Id Bahan Baku",
                     "Nama Bahan Baku",
                     "Stok Bahan Baku",
-                    "Minimum Stok",
+                    "Stok Minimum",
                     "Satuan Bahan Baku",
                     "Harga Bahan Baku",
+                    "Keterangan",
                 ]}
             >
-                {dataBahanBaku.map((item) => (
+                {dataBahanBaku.map((item, index) => (
                     <tr
                         key={item.id}
                         className="hover:bg-blue-50 cursor-pointer"
                     >
+                        <td className="border px-3 py-2">{index + 1}</td>
                         <td className="px-5 py-2 border font-bold uppercase">
                             {item.id_bahan_baku}
                         </td>
@@ -67,8 +48,15 @@ function LaporanBahanBaku() {
                         <td className="px-3 py-2 border">
                             {item.satuan_bahan_baku}
                         </td>
+                        <td className="px-3 py-2 border">
+                            <FormaterRupiah number={item.harga_bahan_baku} />
+                        </td>
                         <td className="px-5 py-2 border">
-                            {item.harga_bahan_baku}
+                            {item.stok_bahan_baku > item.minimum_stok
+                                ? "baik"
+                                : item.stok_bahan_baku === item.minimum_stok
+                                ? "cukup"
+                                : "kurang"}
                         </td>
                     </tr>
                 ))}
@@ -77,4 +65,4 @@ function LaporanBahanBaku() {
     );
 }
 
-export default LaporanBahanBaku;
+export default LaporanStokBahanBaku;

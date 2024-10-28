@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Label from "../../../Components/Label";
 import PrimaryButton from "../../../Components/PrimaryButton";
-import Empty from "../../../Components/Empty";
 import { useForm } from "@inertiajs/react";
+import axios from "axios";
 
 const BahanBaku = ({ dataBahanBaku, id, userId }) => {
     const [jumlah, setJumlah] = useState("");
     const [dataProduksiDetail, setDataProduksiDetail] = useState([]);
     const [selectedBahanBaku, setSelectedBahanBaku] = useState(null);
-    const [filterIds, setFilterIds] = useState([]);
     const { data, setData, post } = useForm({ produksi: [] });
 
     const handleAddProduksi = () => {
@@ -26,6 +25,8 @@ const BahanBaku = ({ dataBahanBaku, id, userId }) => {
                 );
                 return;
             }
+
+            // Memeriksa apakah bahan baku sudah ditambahkan
             const existingProduksi = data.produksi.find(
                 (produksi) => produksi.bahan_baku_id === selectedBahanBaku.id
             );
@@ -53,10 +54,6 @@ const BahanBaku = ({ dataBahanBaku, id, userId }) => {
         setData("produksi", newProduksi);
     };
 
-    const filterData = dataBahanBaku.filter(
-        (bahanBaku) => !filterIds.includes(bahanBaku.id)
-    );
-
     const calculateTotalUsed = (bahanBaku) => {
         return data.produksi
             .filter((produksi) => produksi.bahan_baku_id === bahanBaku.id)
@@ -70,32 +67,48 @@ const BahanBaku = ({ dataBahanBaku, id, userId }) => {
 
     const handleSubmitAll = () => {
         if (data.produksi.length > 0) {
-            console.log(data.produksi);
             post("/create-data-produksi-produksi", { produksi: data.produksi });
         }
     };
 
     useEffect(() => {
-        const fetchDataPrduksiDetail = async () => {
-            const response = await axios.get(
-                `/api/bintangsepatu/produksi/${id}`
-            );
-            setDataProduksiDetail(response.data);
+        const fetchDataProduksiDetail = async () => {
+            try {
+                const response = await axios.get(
+                    `/api/bintangsepatu/produksi/${id}`
+                );
+                setDataProduksiDetail(response.data);
+            } catch (error) {
+                console.error("Error fetching produksi detail:", error);
+            }
         };
-        fetchDataPrduksiDetail();
+        fetchDataProduksiDetail();
     }, [id]);
 
     return (
-        <div className="w-full flex gap-5 ml-8">
-            <div className="w-96 border-r h-screen overflow-auto">
-                <input type="hidden" value={id} />
-                <input type="hidden" value={userId} />
-                <div className="text-sm mb-5 flex gap-2 items-center border-b border-dashed pb-2 pt-5">
-                    <Label className={"bg-green-500"} rotate={"rotate-90"} />
-                    <h1 className="font-bold">Daftar bahan baku</h1>
+        <div className="w-full flex gap-5">
+            <div className="w-96 h-screen overflow-auto pb-32">
+                <div className="absolute top-2 z-30 right-0">
+                    <div className="flex justify-between gap-5 items-center bg-pink-500/20 text-center p-2 border border-dashed border-pink-500 rounded-md">
+                        <h1 className="w-96 font-black uppercase">
+                            {dataProduksiDetail.id_produksi}
+                        </h1>
+                        <div className="text-sm">
+                            <div
+                                className="bg-pink-400 p-2 rounded-md text-center cursor-pointer w-7"
+                                onClick={() => window.location.reload()}
+                            >
+                                <img
+                                    src="/assets/icons/plus.png"
+                                    alt=""
+                                    className="w-3 h-3 rotate-45"
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div className="flex flex-col gap-5 mr-5 pb-32">
-                    {filterData.map((bahanBaku) => (
+                <div className="flex flex-col gap-5 pb-32">
+                    {dataBahanBaku.map((bahanBaku) => (
                         <div
                             key={bahanBaku.id}
                             className={`hover:border-pink-500 border border-dashed p-5 cursor-pointer rounded-md shadow-lg relative ${
@@ -136,7 +149,7 @@ const BahanBaku = ({ dataBahanBaku, id, userId }) => {
                                         </p>
                                     </div>
                                     {selectedBahanBaku?.id === bahanBaku.id && (
-                                        <div className="">
+                                        <div>
                                             <input
                                                 type="number"
                                                 value={jumlah}
@@ -163,39 +176,13 @@ const BahanBaku = ({ dataBahanBaku, id, userId }) => {
                     ))}
                 </div>
             </div>
-            <div className="w-full h-screen overflow-auto mr-10 pb-32">
-                <div className="text-sm flex justify-between items-center mb-5 border-b border-dashed pb-2 pt-5">
-                    <div className="flex gap-2 items-center ">
-                        <Label className={"bg-red-500"} rotate={"rotate-90"} />
-                        <h1 className="font-bold">
-                            Daftar penggunaan bahan baku
-                        </h1>
-                    </div>
-                    <div
-                        className="bg-pink-400 p-2 rounded-md text-center  cursor-pointer w-7"
-                        onClick={() => window.location.reload()}
-                    >
-                        <img
-                            src="/assets/icons/plus.png"
-                            alt=""
-                            className="w-3 h-3 rotate-45"
-                        />
-                    </div>
-                </div>
-                <div className="w-64 mx-auto">
-                    <h1 className="font-black uppercase bg-pink-500/20 text-center p-2 border border-dashed border-pink-500 rounded-md">
-                        {dataProduksiDetail.id_produksi}
-                    </h1>
-                </div>
-
-                <div className="relative mt-10 grid grid-cols-3 gap-5 mr-5">
+            <div className="w-full h-screen overflow-auto pb-32">
+                <div className="relative grid grid-cols-3 gap-5 pb-32">
                     {data.produksi.map((produksi, index) => {
                         const bahanBaku = dataBahanBaku.find(
                             (b) => b.id === produksi.bahan_baku_id
                         );
                         if (!bahanBaku) return null;
-
-                        const totalUsed = calculateTotalUsed(bahanBaku);
 
                         return (
                             <div
@@ -231,7 +218,7 @@ const BahanBaku = ({ dataBahanBaku, id, userId }) => {
                                         <p className="text-xs mt-2">
                                             Penggunaan: <br />
                                             <span className="text-red-500 font-bold">
-                                                {totalUsed}{" "}
+                                                {produksi.jumlah_bahan_baku}{" "}
                                                 {bahanBaku.satuan_bahan_baku}
                                             </span>
                                         </p>
@@ -247,7 +234,7 @@ const BahanBaku = ({ dataBahanBaku, id, userId }) => {
                                     </div>
                                     <div className="absolute top-2 right-2">
                                         <div
-                                            className="bg-pink-400 p-2 rounded-md text-center  cursor-pointer w-7"
+                                            className="bg-pink-400 p-2 rounded-md text-center cursor-pointer w-7"
                                             onClick={() =>
                                                 handleRemoveProduksi(index)
                                             }
@@ -264,7 +251,7 @@ const BahanBaku = ({ dataBahanBaku, id, userId }) => {
                         );
                     })}
                 </div>
-                {data.produksi.length !== 0 && (
+                {data.produksi.length > 0 && (
                     <div className="fixed bottom-10 right-10">
                         <PrimaryButton onClick={handleSubmitAll}>
                             Kirim Semua Data

@@ -6,12 +6,14 @@ use App\Models\BahanBaku;
 use App\Models\CatatanProduksi;
 use App\Models\CatatanStok;
 use App\Models\DataLaporan;
+use App\Models\DataLaporanProduksi;
 use App\Models\DataProdukMasuk;
 use App\Models\DataProduksi;
 use App\Models\LaporanProduksi;
 use App\Models\Produk;
 use App\Models\Produksi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ProduksiController extends Controller
@@ -65,12 +67,17 @@ class ProduksiController extends Controller
             "id_produk" => 'required',
             "nama_produk" => 'required',
             "harga_produk" => 'required',
+            "gambar_produk" => 'required',
             "user_id" => 'required',
         ]);
+        $validated['id_produk'] = 'PRDK-' . $validated['id_produk'];
         $existingRecord = Produk::where('id_produk', $validated['id_produk'])->first();
 
         if ($existingRecord) {
             return back()->withErrors(['message' => 'Data id produk sudah ada, gagal menambahkan data produk!, coba dengan id produk yang berbeda']);
+        }
+        if ($request->hasFile('gambar_produk')) {
+            $validated['gambar_produk'] = $request->file('gambar_produk')->store('gambar_produk', 'public');
         }
         Produk::create($validated);
         return Inertia::location("/daftar-produk-produksi");
@@ -78,30 +85,11 @@ class ProduksiController extends Controller
     public function deleteProduk(String $id)
     {
         $data = Produk::findOrFail($id);
-
+        if ($data->gambar_produk) {
+            Storage::disk('public')->delete($data->gambar_produk);
+        }
         $data->delete();
         return Inertia::location("/daftar-produk-produksi");
-    }
-
-    public function createCatatanProduk(Request $request)
-    {
-        $validated = $request->validate([
-            "catatan" => 'required',
-            "user_id" => 'required',
-            "produk_id" => 'required',
-        ]);
-        CatatanProduksi::create($validated);
-        return Inertia::location("/daftar-produk-produksi");
-    }
-    public function createCatatanStok(Request $request)
-    {
-        $validated = $request->validate([
-            "catatan" => 'required',
-            "user_id" => 'required',
-            "bahan_baku_id" => 'required',
-        ]);
-        CatatanStok::create($validated);
-        return Inertia::location("/daftar-stok-produksi");
     }
 
     public function createProduksi(Request $request)
@@ -119,6 +107,7 @@ class ProduksiController extends Controller
             "produk_id" => 'required',
 
         ]);
+        $validated['id_produksi'] = 'PRDKSI-' . $validated['id_produksi'];
         $existingRecord = Produksi::where('id_produksi', $validated['id_produksi'])->first();
 
         if ($existingRecord) {
@@ -177,12 +166,12 @@ class ProduksiController extends Controller
 
         foreach ($validated['produksi'] as $produksi) {
 
-            DataLaporan::create($produksi);
+            DataLaporanProduksi::create($produksi);
 
 
             $produk = BahanBaku::find($produksi['bahan_baku_id']);
             if ($produk) {
-                $produk->stok_bahan_baku += $produksi['pemakaian_bahan_baku'];
+                $produk->stok_bahan_baku += $produksi['sisa_bahan_baku'];
                 $produk->save();
             }
             $dataLaporan = LaporanProduksi::find($produksi['laporan_id']);
@@ -212,6 +201,7 @@ class ProduksiController extends Controller
             "produk_id" => "required",
             "produksi_id" => "required",
         ]);
+        $validated['id_laporan'] = 'LPRDKSI-' . $validated['id_laporan'];
         $existingRecord = LaporanProduksi::where('id_laporan', $validated['id_laporan'])->first();
 
         if ($existingRecord) {
@@ -243,7 +233,7 @@ class ProduksiController extends Controller
             'produk_id' => "required",
             'user_id' => "required",
         ]);
-
+        $validated['id_produksi_masuk'] = 'PKRM-' . $validated['id_produksi_masuk'];
         $laporan = LaporanProduksi::findOrFail($validated["laporan_id"]);
 
         if ($laporan) {

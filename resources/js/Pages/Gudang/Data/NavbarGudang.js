@@ -27,7 +27,7 @@ export const navbarGudang = [
         id: 5,
         nama: "Pesan Masuk",
         link: "/pesan-masuk-gudang",
-        gambar: "/assets/icons/product.png",
+        gambar: "/assets/icons/email.png",
     },
     {
         id: 6,

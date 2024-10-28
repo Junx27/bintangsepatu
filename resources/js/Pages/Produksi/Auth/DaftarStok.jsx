@@ -9,14 +9,16 @@ import PopOver from "@/Components/PopOver";
 import Pagination from "@/Layouts/Pagination";
 import Label from "@/Components/Label";
 import NavbarProduksi from "../Layouts/NavbarProduksi";
+import FormateDate from "@/Components/FormateDate";
+import FormaterRupiah from "@/Layouts/FormaterRupiah";
 
 function DaftarStok({ auth }) {
+    const tanggal = new Date();
     const [id, setId] = useState(null);
     const [namaProduk, setNamaProduk] = useState("");
     const [produkId, setIdProduk] = useState("");
     const [stokProduk, setStokProduk] = useState("");
-    const [dataProduk, setDataProduk] = useState([]);
-    const [openCatatan, setOpenCatatan] = useState(false);
+    const [dataBahanBaku, setDataBahanBaku] = useState([]);
     const [open, setOpen] = useState(false);
     const { data, setData, post, errors } = useForm({
         id_produk: "",
@@ -28,12 +30,12 @@ function DaftarStok({ auth }) {
         bahan_baku_id: "",
         user_id: auth.user.id,
     });
-    const ITEMS_PER_PAGE = 12;
+    const ITEMS_PER_PAGE = 30;
 
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedIds, setSelectedIds] = useState([]);
 
-    const totalPages = Math.ceil(dataProduk.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(dataBahanBaku.length / ITEMS_PER_PAGE);
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
@@ -53,7 +55,7 @@ function DaftarStok({ auth }) {
         const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
         const endIndex = startIndex + ITEMS_PER_PAGE;
 
-        let filteredData = dataProduk;
+        let filteredData = dataBahanBaku;
 
         return filteredData.slice(startIndex, endIndex);
     };
@@ -69,7 +71,7 @@ function DaftarStok({ auth }) {
     useEffect(() => {
         const fetchData = async () => {
             const response = await axios.get("/api/bintangsepatu/bahan-bakus");
-            setDataProduk(response.data);
+            setDataBahanBaku(response.data);
         };
         if (id !== null) {
             const fetchSingleData = async () => {
@@ -90,10 +92,6 @@ function DaftarStok({ auth }) {
         e.preventDefault();
         post("/create-produk-produksi");
     };
-    const handleSubmitCatatan = (e) => {
-        e.preventDefault();
-        post("/create-catatan-stok-produksi");
-    };
     return (
         <RoleAccess auth={auth} role={"produksi"}>
             {errors.message && (
@@ -106,11 +104,22 @@ function DaftarStok({ auth }) {
                     </div>
                 </PopOver>
             )}
-            <NavbarProduksi navbar={navbarProduksi} title={"Daftar Stok"}>
-                <div className="flex ml-12 pl-2 mt-2">
-                    <div className="w-full relative">
+            <NavbarProduksi
+                navbar={navbarProduksi}
+                title={"Daftar Stok"}
+                auth={auth}
+            >
+                <div className="flex m-5 ml-20">
+                    <div className="w-full h-screen overflow-auto pb-32 relative mt-10">
+                        <h1 className="font-black text-2xl uppercase text-center mb-5">
+                            data tabel semua stok bahan baku
+                        </h1>
+                        <p className="text-end text-xs">
+                            <FormateDate data={tanggal} />
+                        </p>
                         <Table
                             header={[
+                                "No",
                                 "Id Bahan Baku",
                                 "Nama Bahan Baku",
                                 "Stok Bahan Baku",
@@ -119,12 +128,15 @@ function DaftarStok({ auth }) {
                                 "Harga Bahan Baku",
                             ]}
                         >
-                            {getCurrentPageData().map((i) => (
+                            {getCurrentPageData().map((i, index) => (
                                 <tr
                                     key={i.id}
                                     className="hover:bg-blue-50 cursor-pointer"
                                     onClick={() => handleCatatan(i.id)}
                                 >
+                                    <td className="border px-3 py-2">
+                                        {index + 1}
+                                    </td>
                                     <td className="px-5 py-2 border font-bold uppercase">
                                         {i.id_bahan_baku}
                                     </td>
@@ -135,162 +147,33 @@ function DaftarStok({ auth }) {
                                     </td>
                                     <td className="px-5 py-2 border">
                                         {i.stok_bahan_baku}
-                                        <span
-                                            className={`relative ml-3 rounded-full text-center p-1 text-[10px] font-normal pl-5 pr-3 ${
-                                                i.stok_bahan_baku >
-                                                i.minimum_stok
-                                                    ? "bg-green-500/20 text-green-600"
-                                                    : i.stok_bahan_baku ===
-                                                      i.minimum_stok
-                                                    ? "bg-purple-500/20 text-purple-500"
-                                                    : "bg-red-500/20 text-red-600"
-                                            }`}
-                                        >
-                                            {i.stok_bahan_baku > i.minimum_stok
-                                                ? "+aman"
-                                                : i.stok_bahan_baku ===
-                                                  i.minimum_stok
-                                                ? "+cukup"
-                                                : "-kurang"}
-                                            <span
-                                                className={`inset-0 absolute w-2 h-2 top-[6px] left-1 rounded-full animate-pulse ${
-                                                    i.stok_bahan_baku >
-                                                    i.minimum_stok
-                                                        ? "bg-green-500"
-                                                        : i.stok_bahan_baku ===
-                                                          i.minimum_stok
-                                                        ? "bg-purple-500"
-                                                        : "bg-red-500"
-                                                }`}
-                                            ></span>
-                                        </span>
                                     </td>
                                     <td className="px-5 py-2 border">
                                         <div className="relative">
                                             {i.minimum_stok}
-                                            {!open && (
-                                                <span className="absolute truncate bottom-0 right-0 rounded-full text-[8px] h-5 w-12  font-normal px-2 bg-green-500/20 text-green-600 overflow-hidden">
-                                                    +
-                                                    {(
-                                                        (i.stok_bahan_baku /
-                                                            i.minimum_stok) *
-                                                        100
-                                                    ).toFixed(0)}
-                                                    %
-                                                </span>
-                                            )}
                                         </div>
                                     </td>
                                     <td className="px-3 py-2 border">
                                         {i.satuan_bahan_baku}
                                     </td>
-                                    <td className="px-5 py-2 border border-r-0">
-                                        {i.harga_bahan_baku}
+                                    <td className="px-5 py-2 border">
+                                        <FormaterRupiah
+                                            number={i.harga_bahan_baku}
+                                        />
                                     </td>
                                 </tr>
                             ))}
-                            {openCatatan && (
-                                <p
-                                    className={`bg-yellow-300 group flex p-2 rounded-md absolute -top-9 cursor-pointer ${
-                                        openCatatan ? "-right-10" : "right-2"
-                                    }`}
-                                    onClick={() => setOpenCatatan(!openCatatan)}
-                                >
-                                    <img
-                                        src="/assets/icons/plus.png"
-                                        alt=""
-                                        className={`w-3 h-3 ${
-                                            openCatatan ? "rotate-45" : ""
-                                        }`}
-                                    />
-                                </p>
-                            )}
                         </Table>
                         <div className="mb-5">
                             <Pagination
                                 currentPage={currentPage}
                                 totalPages={totalPages}
                                 onPageChange={handlePageChange}
-                                data={dataProduk}
-                                jumlahData={dataProduk.length}
-                                keterangan={"produk"}
+                                data={dataBahanBaku}
+                                jumlahData={dataBahanBaku.length}
+                                keterangan={"bahan baku"}
                             />
                         </div>
-                    </div>
-                    <div
-                        className={`transisition-all duration-500 bg-white border-l h-screen ${
-                            openCatatan ? "w-96" : "w-0 opacity-0"
-                        }`}
-                    >
-                        <form
-                            action=""
-                            className={`p-5 ${
-                                openCatatan ? "block" : "hidden opacity-0"
-                            }`}
-                            onSubmit={handleSubmitCatatan}
-                        >
-                            <h1 className="font-bold pt-10 text-center truncate">
-                                Menambahkan Catatan
-                            </h1>
-                            <div className="text-sm mt-5 flex flex-col gap-2 border-b border-dashed pb-5">
-                                <p className="">
-                                    Penerima:
-                                    <span className="truncate font-normal uppercase text-green-500 bg-green-500/20 p-1 rounded-md text-xs mx-2">
-                                        Tim Gudang
-                                    </span>
-                                </p>
-                                <p className="border-t border-dashed pt-2">
-                                    Detail:
-                                </p>
-                                <div className="flex justify-between items-center">
-                                    <p className="font-bold">
-                                        {produkId} <br />
-                                        <Label className={"bg-blue-500"} />
-                                        <span className="font-normal capitalize">
-                                            {namaProduk}
-                                        </span>
-                                    </p>
-                                    <p className="mr-10">
-                                        Stok: <br />
-                                        <span className="font-bold">
-                                            {stokProduk}
-                                        </span>
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="my-4">
-                                <InputLabel
-                                    htmlFor="nama_produk"
-                                    value="Tambahakan Catatan"
-                                />
-                                <textarea
-                                    type="text"
-                                    name="catatan"
-                                    id=""
-                                    value={data.catatan}
-                                    onChange={(e) =>
-                                        setData("catatan", e.target.value)
-                                    }
-                                    className="w-full mt-2 rounded-md border-dashed"
-                                    rows={5}
-                                ></textarea>
-                                <input
-                                    type="number"
-                                    value={data.bahan_baku_id}
-                                    name="produk_id"
-                                    className="hidden"
-                                />
-                                <input
-                                    type="number"
-                                    value={data.user_id}
-                                    name="user_id"
-                                    className="hidden"
-                                />
-                            </div>
-                            <div className="flex justify-end">
-                                <PrimaryButton>Kirim</PrimaryButton>
-                            </div>
-                        </form>
                     </div>
                 </div>
             </NavbarProduksi>

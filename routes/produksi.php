@@ -10,8 +10,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get("/dashboard-produksi", [ProduksiController::class, "dashboard"])->name('dashboard.produksi');
     Route::get("/daftar-pesanan-produksi", [ProduksiController::class, "daftarPesanan"])->name('daftar.pesanan.produksi');
     Route::get("/daftar-produk-produksi", [ProduksiController::class, "daftarProduk"])->name('daftar.produk.produksi');
-    Route::post("/create-catatan-produk-produksi", [ProduksiController::class, "createCatatanProduk"])->name('create.catatan.produk.produksi');
-    Route::post("/create-catatan-stok-produksi", [ProduksiController::class, "createCatatanStok"])->name('create.catatan.stok.produksi');
     Route::post("/create-data-produksi-produksi", [ProduksiController::class, "createDataProduksi"])->name('create.dataproduksi.produksi');
     Route::delete("/daftar-produk-produksi/{id}", [ProduksiController::class, "deleteProduk"])->name('delete.produk.produksi');
     Route::post("/create-produk-produksi", [ProduksiController::class, "createProduk"])->name('create.produk.produksi');

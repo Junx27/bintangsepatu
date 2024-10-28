@@ -50,6 +50,9 @@ function ChartProdukMasuk({ analisis }) {
 
     return (
         <div>
+            <h1 className="font-black text-2xl uppercase text-center mb-10">
+                data grafik produk masuk
+            </h1>
             <canvas ref={chartRef} />
         </div>
     );

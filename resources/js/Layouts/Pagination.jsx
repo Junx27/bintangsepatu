@@ -24,7 +24,7 @@ const Pagination = ({
 
     return (
         <nav className="mt-5 py-1 flex flex-col items-center justify-center sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <div className="ml-[60px] flex flex-col items-center justify-center sm:justify-start">
+            <div className="flex flex-col items-center justify-center sm:justify-start">
                 <p className="text-xs text-gray-700">
                     Halaman
                     <span className="font-bold text-blue-500">

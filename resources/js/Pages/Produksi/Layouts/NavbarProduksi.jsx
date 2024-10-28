@@ -1,21 +1,39 @@
+import DownloadPDF from "@/Components/DownloadPDF";
 import Notification from "@/Components/Notification";
+import EditProfile from "@/Pages/Auth/EditProfile";
 import { Head, Link, usePage } from "@inertiajs/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-function NavbarProduksi({ children, navbar, title }) {
+function NavbarProduksi({
+    children,
+    navbar,
+    title,
+    auth,
+    pdfRef,
+    fileName,
+    layout,
+}) {
     const { url } = usePage();
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
     const data = navbar;
     const [dataProduksi, setDataProduksi] = useState([]);
     const [dataPesanan, setDataPesanan] = useState([]);
     const [dataVerification, setDataVerification] = useState([]);
     const [dataUnVerification, setDataUnVerification] = useState([]);
     const [dataLaporanProduksi, setDataLaporanProduksi] = useState([]);
+    const [dataLaporanProduksiSuccess, setDataLaporanProduksiSuccess] =
+        useState([]);
     const [dataBahanBaku, setDataBahanBaku] = useState([]);
     const [dataInventory, setDataInventory] = useState([]);
 
     useEffect(() => {
+        const fetchDataProduksiSuccess = async () => {
+            const response = await axios.get(
+                "/api/bintangsepatu/laporan-produksis-verified"
+            );
+            setDataLaporanProduksiSuccess(response.data);
+        };
         const fetchDataProduk = async () => {
             const response = await axios.get(
                 "/api/bintangsepatu/produksi-proses"
@@ -52,6 +70,7 @@ function NavbarProduksi({ children, navbar, title }) {
             const response = await axios.get("/api/bintangsepatu/produks");
             setDataInventory(response.data);
         };
+        fetchDataProduksiSuccess();
         fetchDataUnVerify();
         fetchDataInventory();
         fetchDataBahanBaku();
@@ -68,6 +87,15 @@ function NavbarProduksi({ children, navbar, title }) {
     return (
         <div className="">
             <Head title={title} />
+            {open && (
+                <div className="absolute right-0 z-50 w-72 h-screen bg-white pt-20 px-5 border-l">
+                    <EditProfile
+                        userId={auth.user.id}
+                        name={auth.user.name}
+                        image={auth.user.image}
+                    />
+                </div>
+            )}
             <div className="fixed top-0 bg-white border-b w-full py-2 left-0 px-4 z-50">
                 <div className="flex gap-10 justify-between items-center">
                     <div className="flex justify-start items-center gap-2">
@@ -80,87 +108,127 @@ function NavbarProduksi({ children, navbar, title }) {
                             BINTANG SEPATU
                         </h2>
                     </div>
-                    <div className="flex gap-5 text-[8px]">
-                        <div className="flex flex-col items-center gap-2 bg-blue-500/20 p-2 rounded-md font-black w-20 border border-dashed border-blue-500">
-                            <h1>Produk:</h1>
-                            <p className="text-blue-500">
-                                {dataInventory.length}
+                    <div className="text-[8px] flex items-center gap-5">
+                        <div className="flex items-center gap-2">
+                            <img
+                                src="/assets/icons/stock.png"
+                                alt=""
+                                className="w-5 h-5"
+                            />
+                            <p>
+                                Jumlah Produk:{" "}
+                                <span className="font-black text-[#0C15F7]">
+                                    {dataInventory.length}
+                                </span>
                             </p>
                         </div>
-                        <div className="flex flex-col items-center gap-2 bg-purple-500/20 p-2 rounded-md font-black w-20 border border-dashed border-purple-500">
-                            <h1>Bahan Baku:</h1>
-                            <p className="text-purple-500">
-                                {dataBahanBaku.length}
+                        <div className="flex items-center gap-2">
+                            <img
+                                src="/assets/icons/stock.png"
+                                alt=""
+                                className="w-5 h-5"
+                            />
+                            <p>
+                                Jumlah Bahan Baku:{" "}
+                                <span className="font-black text-[#0C15F7]">
+                                    {dataBahanBaku.length}
+                                </span>
                             </p>
                         </div>
-                        <div className="flex flex-col items-center gap-2 bg-green-500/20 p-2 rounded-md font-black w-20 border border-dashed border-green-500">
-                            <h1>Verify:</h1>
-                            <p className="text-green-500">
-                                {dataLaporanProduksi.length}
+                        <div className="flex items-center gap-2">
+                            <img
+                                src="/assets/icons/checklist.png"
+                                alt=""
+                                className="w-5 h-5"
+                            />
+                            <p>
+                                Terverifikasi:{" "}
+                                <span className="font-black text-green-500">
+                                    {dataLaporanProduksi.length}
+                                </span>
                             </p>
                         </div>
-                        <div className="flex flex-col items-center gap-2 bg-yellow-500/20 p-2 rounded-md font-black w-20 border border-dashed border-yellow-500">
-                            <h1>Unverify:</h1>
-                            <p className="text-red-500">
-                                {dataVerification.length +
-                                    dataUnVerification.length}
+                        <div className="flex items-center gap-2">
+                            <img
+                                src="/assets/icons/enroll.png"
+                                alt=""
+                                className="w-5 h-5"
+                            />
+                            <p>
+                                Belum Terverifikasi:{" "}
+                                <span className="font-black text-red-500">
+                                    {dataVerification.length +
+                                        dataUnVerification.length}
+                                </span>
                             </p>
                         </div>
-                        <div className="flex flex-col items-center gap-2 bg-pink-500/20 p-2 rounded-md font-black w-20 border border-dashed border-red-500">
-                            <h1>Prepairing:</h1>
-                            <p className="text-red-500">
-                                {dataProduksi.length}
+                        <div className="flex items-center gap-2">
+                            <img
+                                src="/assets/icons/preparation.png"
+                                alt=""
+                                className="w-5 h-5"
+                            />
+                            <p>
+                                Persiapan Produksi:{" "}
+                                <span className="font-black text-red-500">
+                                    {dataProduksi.length}
+                                </span>
                             </p>
                         </div>
                     </div>
                     <div className="flex gap-5 text-[7px]">
-                        <div className="flex flex-col items-center gap-1 hover:bg-yellow-300 p-2 rounded-md w-12">
+                        <div className="hover:bg-blue-50 p-2 rounded-md cursor-pointer">
                             <img
                                 src="/assets/icons/search.png"
                                 alt=""
                                 className="w-4 h-4"
                             />
-                            <h1>Cari</h1>
                         </div>
-                        <div className="flex flex-col items-center gap-1 hover:bg-yellow-300 p-2 rounded-md w-12">
+                        <div className="hover:bg-blue-50 p-2 rounded-md cursor-pointer">
                             <img
                                 src="/assets/icons/check.png"
                                 alt=""
                                 className="w-4 h-4"
                             />
-                            <h1>Status</h1>
                         </div>
-                        <div className="flex flex-col items-center gap-1 hover:bg-yellow-300 p-2 rounded-md w-12">
-                            <img
-                                src="/assets/icons/printer.png"
-                                alt=""
-                                className="w-4 h-4"
-                            />
-                            <h1>Cetak</h1>
+                        <div className="hover:bg-blue-50 p-2 rounded-md cursor-pointer">
+                            <DownloadPDF
+                                pdfRef={pdfRef}
+                                fileName={fileName}
+                                layout={layout}
+                            >
+                                <img
+                                    src="/assets/icons/printer.png"
+                                    alt=""
+                                    className="w-4 h-4"
+                                />
+                            </DownloadPDF>
                         </div>
-                        <div className="flex flex-col items-center gap-1 hover:bg-yellow-300 p-2 rounded-md w-12">
+                        <div
+                            className={`relative hover:bg-blue-50 p-2 rounded-md cursor-pointer overflow-hidden ${
+                                open ? "bg-blue-50" : ""
+                            }`}
+                            onClick={() => setOpen(!open)}
+                        >
                             <img
                                 src="/assets/icons/settings.png"
                                 alt=""
                                 className="w-4 h-4"
                             />
-                            <h1>Pengaturan</h1>
-                        </div>
-                        <div className="relative flex flex-col items-center gap-1 hover:bg-yellow-300 p-2 rounded-md w-12">
-                            <img
-                                src="/assets/icons/alert.png"
-                                alt=""
-                                className="w-4 h-4"
-                            />
-                            <h1>Notifikasi</h1>
-                            <span className="w-2 h-2 bg-red-500 rounded-full absolute right-2 animate-pulse"></span>
+                            <div
+                                className={`absolute bottom-0 left-0 h-[5px] w-full bg-[#0C15F7] transition-opacity rounded-l-md duration-300 ${
+                                    open ? "opacity-100" : "opacity-0"
+                                }`}
+                            ></div>
                         </div>
                     </div>
 
                     <div className="flex gap-5 items-center text-xs">
-                        <h1 className="text-sm font-bold">Ardiansyah</h1>
+                        <h1 className="text-sm font-bold w-32 truncate text-end capitalize">
+                            {auth.user.name}
+                        </h1>
                         <img
-                            src="https://web.rupa.ai/wp-content/uploads/2023/06/GVS_A_simple_background_for_a_LinkedIn_profile_picture_perhaps__75435bbf-9b8f-4815-8e9e-d5194e92061d.png"
+                            src={`storage/${auth.user.image}`}
                             alt=""
                             className="w-8 h-8 rounded-full"
                         />
@@ -173,8 +241,8 @@ function NavbarProduksi({ children, navbar, title }) {
                         <Link
                             key={i.nama}
                             href={i.link}
-                            className={`relative p-1 group flex gap-5 items-center rounded-md hover:bg-yellow-300 ${
-                                url === i.link ? "bg-yellow-300" : ""
+                            className={`relative p-1 group flex gap-5 items-center rounded-md hover:bg-blue-50 ${
+                                url === i.link ? "bg-blue-50" : ""
                             } 
                             `}
                         >
@@ -183,9 +251,14 @@ function NavbarProduksi({ children, navbar, title }) {
                                 alt=""
                                 className="w-5 h-5 mx-auto"
                             />
-                            <p className="transtion-all duration-200 group-hover:block absolute truncate w-0 group-hover:w-20 text-[10px] ml-9 bg-yellow-300 group-hover:p-1 rounded-r-md overflow-hidden">
+                            <p className="transtion-all duration-200 group-hover:block absolute truncate w-0 group-hover:w-20 text-[10px] ml-9 bg-blue-50 group-hover:p-1 rounded-r-md overflow-hidden">
                                 {i.nama}
                             </p>
+                            <div
+                                className={`absolute top-0 left-0 w-[5px] h-full bg-[#0C15F7] transition-opacity rounded-l-md duration-300 ${
+                                    url === i.link ? "opacity-100" : "opacity-0"
+                                }`}
+                            ></div>
                             {i.nama === "Daftar Repair" && (
                                 <span
                                     className={`w-2 h-2 bg-red-500 rounded-full absolute right-1 top-1 animate-pulse ${
@@ -193,6 +266,11 @@ function NavbarProduksi({ children, navbar, title }) {
                                     }`}
                                 ></span>
                             )}
+                            <Notification
+                                nama={i.nama}
+                                parameter={"Dashboard"}
+                                data={dataLaporanProduksiSuccess}
+                            />
                             <Notification
                                 nama={i.nama}
                                 parameter={"Buat Produksi"}

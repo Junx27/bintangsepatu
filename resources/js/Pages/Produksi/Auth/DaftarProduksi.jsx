@@ -11,8 +11,20 @@ import TextInput from "@/Components/TextInput";
 import PopOver from "@/Components/PopOver";
 import BahanBaku from "../Layouts/BahanBaku";
 import NavbarProduksi from "../Layouts/NavbarProduksi";
+import Notification from "@/Components/Notification";
 
 function DaftarProduksi({ auth }) {
+    const navigasi = [
+        {
+            nama: "tambah produksi baru",
+            icon: "/assets/icons/add-product.png",
+        },
+        {
+            nama: "tambah bahan baku produksi",
+            icon: "/assets/icons/list.png",
+        },
+    ];
+    const [view, setView] = useState("tambah produksi baru");
     const [id, setId] = useState(null);
     const [createProduksi, setCreateProduksi] = useState(false);
     const [tambahBahanBaku, setTambahBahanBaku] = useState(false);
@@ -87,7 +99,11 @@ function DaftarProduksi({ auth }) {
 
     return (
         <RoleAccess auth={auth} role={"produksi"}>
-            <NavbarProduksi navbar={navbarProduksi} title={"Daftar Produksi"}>
+            <NavbarProduksi
+                navbar={navbarProduksi}
+                title={"Daftar Produksi"}
+                auth={auth}
+            >
                 {errors.message && (
                     <PopOver>
                         <div className="flex flex-col items-center bg-white p-5 rounded w-96">
@@ -100,25 +116,66 @@ function DaftarProduksi({ auth }) {
                         </div>
                     </PopOver>
                 )}
-                <div className="relative ml-12 text-sm flex gap-5 mr-5">
-                    {!createProduksi && !tambahBahanBaku && (
-                        <div className="w-[500px] h-screen border-r overflow-auto">
-                            <div className="text-sm flex gap-2 items-center border-b border-dashed pb-2 pt-10 mx-5">
-                                <Label
-                                    className={"bg-green-500"}
-                                    rotate={"rotate-90"}
+                <div className="relative m-5 ml-20">
+                    <div className="sticky top-0 z-30 text-sm mb-5 flex gap-2 items-center bg-white w-full py-2">
+                        <Label
+                            className={"bg-[#0C15F7]"}
+                            rotate={"rotate-90"}
+                        />
+                        {navigasi.map((item) => (
+                            <div
+                                key={item}
+                                className={`relative text-[8px] p-2 px-3 rounded-md cursor-pointer mr-5 text-center hover:bg-blue-50 overflow-hidden ${
+                                    view === item.nama ? "bg-blue-50" : ""
+                                }`}
+                                onClick={() => setView(item.nama)}
+                            >
+                                <div className="flex flex-row gap-2 items-center">
+                                    <img
+                                        src={item.icon}
+                                        alt=""
+                                        className="w-4 h-4"
+                                    />
+                                    <p className="">
+                                        {item.nama.charAt(0).toUpperCase() +
+                                            item.nama.slice(1)}
+                                    </p>
+                                    <div
+                                        className={`absolute top-8 w-full h-2 -ml-3 bg-[#0C15F7] transition-opacity duration-300 ${
+                                            view === item.nama
+                                                ? "opacity-100"
+                                                : "opacity-0"
+                                        }`}
+                                    ></div>
+                                </div>
+                                <Notification
+                                    nama={item.nama}
+                                    parameter={"tambah bahan baku produksi"}
+                                    data={dataProduksi}
                                 />
-                                <h1 className="font-bold">
-                                    Daftar produk tersedia
-                                </h1>
                             </div>
-                            <div className="grid grid-cols-1 gap-5 pb-20 p-5">
+                        ))}
+                    </div>
+                    {view === "tambah produksi baru" ? (
+                        <div className="h-screen overflow-auto pb-32">
+                            <div
+                                className={`grid grid-cols-4 gap-5 pb-32 ${
+                                    createProduksi ? "hidden" : "block"
+                                }`}
+                            >
                                 {dataProduk.map((i) => (
                                     <div
                                         key={i.id}
                                         className="hover:border-pink-500 border border-dashed cursor-pointer relative group shadow-lg rounded-xl p-5"
                                     >
-                                        <h1 className="font-black border-b border-dashed pb-2">
+                                        <div className="w-full h-32">
+                                            <img
+                                                src={`storage/${i.gambar_produk}`}
+                                                alt=""
+                                                className="w-full h-full object-cover rounded-lg"
+                                            />
+                                        </div>
+                                        <h1 className="font-black border-b border-dashed pb-2 mt-2">
                                             ID: {i.id_produk}
                                         </h1>
                                         <div>
@@ -217,282 +274,290 @@ function DaftarProduksi({ auth }) {
                                     </div>
                                 ))}
                             </div>
-                        </div>
-                    )}
-                    {createProduksi && (
-                        <div className="w-[500px] mx-auto border-r h-screen">
-                            <div className="flex justify-end mt-10 mr-5">
-                                <div
-                                    className="bg-yellow-300 p-2 rounded-md text-center  cursor-pointer w-7"
-                                    onClick={() => setCreateProduksi(false)}
-                                >
-                                    <img
-                                        src="/assets/icons/plus.png"
-                                        alt=""
-                                        className="w-3 h-3 rotate-45"
-                                    />
-                                </div>
-                            </div>
-                            <div className="">
-                                <div className="text-center">
-                                    <h1 className="font-bold text-center truncate uppercase mt-3">
-                                        Membuat Produksi Produk
-                                    </h1>
-                                    <div className="border border-green-500 bg-green-500/20 border-dashed mx-5 mt-3 p-2 rounded-lg">
-                                        <p className="font-black mb-1">
-                                            {data.id_produk}
-                                        </p>
-                                        <p>{data.nama_produk}</p>
-                                    </div>
-                                </div>
-                                <form
-                                    action=""
-                                    className="p-5"
-                                    onSubmit={handleSubmit}
-                                >
-                                    <div className="">
-                                        <InputLabel
-                                            htmlFor="id_produksi"
-                                            value="Id Produksi"
-                                        />
-                                        <TextInput
-                                            id="id_produksi"
-                                            type="text"
-                                            name="id_produksi"
-                                            value={data.id_produksi}
-                                            className="mt-1 block w-full"
-                                            autoComplete="id_produksi"
-                                            isFocused={true}
-                                            onChange={(e) =>
-                                                setData(
-                                                    "id_produksi",
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-                                        <InputError
-                                            message={errors.id_produksi}
-                                            className="mt-2"
-                                        />
-                                    </div>
-                                    <div className="mt-5">
-                                        <TextInput
-                                            id="id_produk"
-                                            type="text"
-                                            name="id_produk"
-                                            value={data.id_produk}
-                                            className="mt-1 hidden w-full font-bold text-green-500 bg-green-300/20 border-green-500 capitalize"
-                                            autoComplete="id_produk"
-                                            isFocused={true}
-                                        />
-                                        <InputError
-                                            message={errors.id_produk}
-                                            className="mt-2"
-                                        />
-                                    </div>
-                                    <div className="my-4">
-                                        <TextInput
-                                            id="nama_produk"
-                                            type="text"
-                                            name="nama_produk"
-                                            value={data.nama_produk}
-                                            className="mt-1 hidden w-full font-bold text-green-500 bg-green-300/20 border-green-500 capitalize"
-                                            autoComplete="nama_produk"
-                                            maxLength={30}
-                                            isFocused={true}
-                                        />
-                                        <InputError
-                                            message={errors.nama_produk}
-                                            className="mt-2"
-                                        />
-                                    </div>
-                                    <div className="my-4">
-                                        <InputLabel
-                                            htmlFor="email"
-                                            value="Jumlah Produksi"
-                                        />
-                                        <TextInput
-                                            id="jumlah_produksi"
-                                            type="number"
-                                            name="jumlah_produksi"
-                                            value={data.jumlah_produksi}
-                                            className="mt-1 block w-full"
-                                            autoComplete="jumlah_produksi"
-                                            isFocused={true}
-                                            onChange={(e) =>
-                                                setData(
-                                                    "jumlah_produksi",
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-                                        <InputError
-                                            message={errors.jumlah_produksi}
-                                            className="mt-2"
-                                        />
-                                    </div>
-                                    <div className="my-4">
-                                        <InputLabel
-                                            htmlFor="tanggal_mulai"
-                                            value="Estimasi Mulai"
-                                        />
-                                        <TextInput
-                                            id="tanggal_mulai"
-                                            type="date"
-                                            name="tanggal_mulai"
-                                            value={data.tanggal_mulai}
-                                            className="mt-1 block w-full"
-                                            autoComplete="tanggal_mulai"
-                                            isFocused={true}
-                                            onChange={(e) =>
-                                                setData(
-                                                    "tanggal_mulai",
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-                                        <InputError
-                                            message={errors.tanggal_mulai}
-                                            className="mt-2"
-                                        />
-                                    </div>
-                                    <div className="my-4">
-                                        <InputLabel
-                                            htmlFor="estimasi_selesai"
-                                            value="Estimasi Selesai"
-                                        />
-                                        <TextInput
-                                            id="estimasi_selesai"
-                                            type="date"
-                                            name="estimasi_selesai"
-                                            value={data.estimasi_selesai}
-                                            className="mt-1 block w-full"
-                                            autoComplete="estimasi_selesai"
-                                            isFocused={true}
-                                            onChange={(e) =>
-                                                setData(
-                                                    "estimasi_selesai",
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-                                        <InputError
-                                            message={errors.estimasi_selesai}
-                                            className="mt-2"
-                                        />
-                                    </div>
-                                    <div className="my-4">
-                                        <input
-                                            type="number"
-                                            value={data.user_id}
-                                            name="user_id"
-                                            className="hidden"
-                                        />
-
-                                        <input
-                                            type="text"
-                                            value={data.status_produksi}
-                                            name="status_produksi"
-                                            className="hidden"
-                                        />
-                                    </div>
-                                    <div className="flex justify-end mt-10">
-                                        <PrimaryButton>Tambah</PrimaryButton>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    )}
-
-                    <div className="w-full mx-auto mt-5">
-                        {!tambahBahanBaku && (
-                            <div>
-                                <div className="text-sm mb-5 flex gap-2 items-center border-b border-dashed pb-2 pt-5 mx-5">
-                                    <Label
-                                        className={"bg-red-500"}
-                                        rotate={"rotate-90"}
-                                    />
-                                    <h1 className="font-bold">
-                                        Daftar rencana produksi
-                                    </h1>
-                                </div>
-                                <div className="grid grid-cols-3 gap-5 mt-5">
-                                    {dataProduksi.map((i) => (
+                            {createProduksi && (
+                                <div className="w-96 p-5 border border-dashed border-pink-500 rounded-lg">
+                                    <div className="flex justify-end">
                                         <div
-                                            key={i.id}
-                                            className="hover:border-pink-500 border border-dashed cursor-pointer relative group shadow-lg rounded-xl p-5"
+                                            className="bg-yellow-300 p-2 rounded-md text-center  cursor-pointer w-7"
+                                            onClick={() =>
+                                                setCreateProduksi(false)
+                                            }
                                         >
-                                            <h1 className="font-black uppercase bg-yellow-500/20 text-center p-2 border border-dashed border-yellow-500 rounded-md mb-2">
-                                                {i.id_produksi}
-                                            </h1>
-                                            <h1 className="font-black border-b border-dashed pb-2">
-                                                ID: {i.id_produk}
-                                            </h1>
-                                            <div>
-                                                <Label
-                                                    className={"bg-red-500"}
-                                                />
-                                                <p className="capitalize">
-                                                    {i.nama_produk}{" "}
-                                                    <span className="bg-red-500/20 text-red-500 lowercase relative ml-3 rounded-full text-center p-1 text-[10px] font-normal px-3">
-                                                        {i.status_produksi}
-                                                    </span>
+                                            <img
+                                                src="/assets/icons/plus.png"
+                                                alt=""
+                                                className="w-3 h-3 rotate-45"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="">
+                                        <div className="text-center">
+                                            <div className="border border-green-500 bg-green-500/20 border-dashed mt-3 p-2 rounded-lg">
+                                                <p className="font-black mb-1">
+                                                    {data.id_produk}
                                                 </p>
-                                            </div>
-
-                                            <div className="flex justify-between">
-                                                <div className="mt-3 text-xs">
-                                                    <p>
-                                                        Tanggal Mulai: <br />
-                                                        <span className="font-bold">
-                                                            {i.tanggal_mulai}
-                                                        </span>
-                                                    </p>
-                                                </div>
-                                                <div className="mt-3 text-xs">
-                                                    <p>
-                                                        Estimasi Selesai: <br />
-                                                        <span className="font-bold">
-                                                            {i.estimasi_selesai}
-                                                        </span>
-                                                    </p>
-                                                </div>
-                                                <div className="mt-3 text-xs">
-                                                    <p>
-                                                        QTY: <br />
-                                                        <span className="font-bold">
-                                                            {i.jumlah_produksi}
-                                                        </span>
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div
-                                                className="group-hover:block hidden absolute z-20 top-2 right-2 cursor-pointer"
-                                                onClick={() =>
-                                                    handleBahanBaku(i.id)
-                                                }
-                                            >
-                                                <img
-                                                    src="/assets/icons/plus.png"
-                                                    alt=""
-                                                    className="w-7 h-7 bg-green-300 p-2 rounded-md"
-                                                />
+                                                <p>{data.nama_produk}</p>
                                             </div>
                                         </div>
-                                    ))}
+                                        <form
+                                            action=""
+                                            className="mt-5"
+                                            onSubmit={handleSubmit}
+                                        >
+                                            <div className="">
+                                                <InputLabel
+                                                    htmlFor="id_produksi"
+                                                    value="Id Produksi"
+                                                />
+                                                <TextInput
+                                                    id="id_produksi"
+                                                    type="text"
+                                                    name="id_produksi"
+                                                    value={data.id_produksi}
+                                                    className="mt-1 block w-full"
+                                                    autoComplete="id_produksi"
+                                                    isFocused={true}
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            "id_produksi",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                                <InputError
+                                                    message={errors.id_produksi}
+                                                    className="mt-2"
+                                                />
+                                            </div>
+                                            <div className="mt-5">
+                                                <TextInput
+                                                    id="id_produk"
+                                                    type="text"
+                                                    name="id_produk"
+                                                    value={data.id_produk}
+                                                    className="mt-1 hidden w-full font-bold text-green-500 bg-green-300/20 border-green-500 capitalize"
+                                                    autoComplete="id_produk"
+                                                    isFocused={true}
+                                                />
+                                                <InputError
+                                                    message={errors.id_produk}
+                                                    className="mt-2"
+                                                />
+                                            </div>
+                                            <div className="my-4">
+                                                <TextInput
+                                                    id="nama_produk"
+                                                    type="text"
+                                                    name="nama_produk"
+                                                    value={data.nama_produk}
+                                                    className="mt-1 hidden w-full font-bold text-green-500 bg-green-300/20 border-green-500 capitalize"
+                                                    autoComplete="nama_produk"
+                                                    maxLength={30}
+                                                    isFocused={true}
+                                                />
+                                                <InputError
+                                                    message={errors.nama_produk}
+                                                    className="mt-2"
+                                                />
+                                            </div>
+                                            <div className="my-4">
+                                                <InputLabel
+                                                    htmlFor="email"
+                                                    value="Jumlah Produksi"
+                                                />
+                                                <TextInput
+                                                    id="jumlah_produksi"
+                                                    type="number"
+                                                    name="jumlah_produksi"
+                                                    value={data.jumlah_produksi}
+                                                    className="mt-1 block w-full"
+                                                    autoComplete="jumlah_produksi"
+                                                    isFocused={true}
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            "jumlah_produksi",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                                <InputError
+                                                    message={
+                                                        errors.jumlah_produksi
+                                                    }
+                                                    className="mt-2"
+                                                />
+                                            </div>
+                                            <div className="my-4">
+                                                <InputLabel
+                                                    htmlFor="tanggal_mulai"
+                                                    value="Estimasi Mulai"
+                                                />
+                                                <TextInput
+                                                    id="tanggal_mulai"
+                                                    type="date"
+                                                    name="tanggal_mulai"
+                                                    value={data.tanggal_mulai}
+                                                    className="mt-1 block w-full"
+                                                    autoComplete="tanggal_mulai"
+                                                    isFocused={true}
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            "tanggal_mulai",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                                <InputError
+                                                    message={
+                                                        errors.tanggal_mulai
+                                                    }
+                                                    className="mt-2"
+                                                />
+                                            </div>
+                                            <div className="my-4">
+                                                <InputLabel
+                                                    htmlFor="estimasi_selesai"
+                                                    value="Estimasi Selesai"
+                                                />
+                                                <TextInput
+                                                    id="estimasi_selesai"
+                                                    type="date"
+                                                    name="estimasi_selesai"
+                                                    value={
+                                                        data.estimasi_selesai
+                                                    }
+                                                    className="mt-1 block w-full"
+                                                    autoComplete="estimasi_selesai"
+                                                    isFocused={true}
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            "estimasi_selesai",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                                <InputError
+                                                    message={
+                                                        errors.estimasi_selesai
+                                                    }
+                                                    className="mt-2"
+                                                />
+                                            </div>
+                                            <div className="my-4">
+                                                <input
+                                                    type="number"
+                                                    value={data.user_id}
+                                                    name="user_id"
+                                                    className="hidden"
+                                                />
+
+                                                <input
+                                                    type="text"
+                                                    value={data.status_produksi}
+                                                    name="status_produksi"
+                                                    className="hidden"
+                                                />
+                                            </div>
+                                            <div className="flex justify-end mt-10">
+                                                <PrimaryButton>
+                                                    Tambah
+                                                </PrimaryButton>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                        {tambahBahanBaku && (
-                            <div className="w-full h-screen">
-                                <BahanBaku
-                                    dataBahanBaku={dataBahanBaku}
-                                    id={id}
-                                    userId={auth.user.id}
-                                />
-                            </div>
-                        )}
-                    </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="w-full mx-auto mt-5">
+                            {!tambahBahanBaku && (
+                                <div>
+                                    <div className="grid grid-cols-3 gap-5 mt-5">
+                                        {dataProduksi.map((i) => (
+                                            <div
+                                                key={i.id}
+                                                className="hover:border-pink-500 border border-dashed cursor-pointer relative group shadow-lg rounded-xl p-5"
+                                            >
+                                                <h1 className="font-black uppercase bg-yellow-500/20 text-center p-2 border border-dashed border-yellow-500 rounded-md mb-2">
+                                                    {i.id_produksi}
+                                                </h1>
+                                                <h1 className="font-black border-b border-dashed pb-2">
+                                                    ID: {i.id_produk}
+                                                </h1>
+                                                <div>
+                                                    <Label
+                                                        className={"bg-red-500"}
+                                                    />
+                                                    <p className="capitalize">
+                                                        {i.nama_produk}{" "}
+                                                        <span className="bg-red-500/20 text-red-500 lowercase relative ml-3 rounded-full text-center p-1 text-[10px] font-normal px-3">
+                                                            {i.status_produksi}
+                                                        </span>
+                                                    </p>
+                                                </div>
+
+                                                <div className="flex justify-between">
+                                                    <div className="mt-3 text-xs">
+                                                        <p>
+                                                            Tanggal Mulai:{" "}
+                                                            <br />
+                                                            <span className="font-bold">
+                                                                {
+                                                                    i.tanggal_mulai
+                                                                }
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                    <div className="mt-3 text-xs">
+                                                        <p>
+                                                            Estimasi Selesai:{" "}
+                                                            <br />
+                                                            <span className="font-bold">
+                                                                {
+                                                                    i.estimasi_selesai
+                                                                }
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                    <div className="mt-3 text-xs">
+                                                        <p>
+                                                            QTY: <br />
+                                                            <span className="font-bold">
+                                                                {
+                                                                    i.jumlah_produksi
+                                                                }
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div
+                                                    className="group-hover:block hidden absolute z-20 top-2 right-2 cursor-pointer"
+                                                    onClick={() =>
+                                                        handleBahanBaku(i.id)
+                                                    }
+                                                >
+                                                    <img
+                                                        src="/assets/icons/plus.png"
+                                                        alt=""
+                                                        className="w-7 h-7 bg-green-300 p-2 rounded-md"
+                                                    />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            {tambahBahanBaku && (
+                                <div className="w-full h-screen">
+                                    <BahanBaku
+                                        dataBahanBaku={dataBahanBaku}
+                                        id={id}
+                                        userId={auth.user.id}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </NavbarProduksi>
         </RoleAccess>

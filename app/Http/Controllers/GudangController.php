@@ -100,6 +100,7 @@ class GudangController extends Controller
             "user_id" => "required",
 
         ]);
+        $validated['id_bahan_baku'] = 'BHBK-' . $validated['id_bahan_baku'];
         $existingRecord = BahanBaku::where('id_bahan_baku', $validated['id_bahan_baku'])->first();
 
         if ($existingRecord) {

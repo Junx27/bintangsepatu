@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer("harga_produk");
             $table->integer("stok_produk")->default(0);
             $table->integer("stok_minimum_produk")->default(0);
+            $table->string("gambar_produk");
             $table->foreignId("user_id")->constrained("users")->onDelete("cascade");
             $table->timestamps();
         });

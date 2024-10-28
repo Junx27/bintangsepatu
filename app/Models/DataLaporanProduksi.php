@@ -5,10 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class DataLaporan extends Model
+class DataLaporanProduksi extends Model
 {
     use HasFactory;
-
     protected $fillable = [
         'jumlah_bahan_baku',
         'pemakaian_bahan_baku',

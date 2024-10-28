@@ -12,15 +12,27 @@ import FormaterRupiah from "@/Layouts/FormaterRupiah";
 import Pagination from "@/Layouts/Pagination";
 import Label from "@/Components/Label";
 import NavbarProduksi from "../Layouts/NavbarProduksi";
+import FormateDate from "@/Components/FormateDate";
 
 function DaftarProduk({ auth }) {
+    const navigasi = [
+        {
+            nama: "data semua produk",
+            icon: "/assets/icons/product.png",
+        },
+        {
+            nama: "tambah produk baru",
+            icon: "/assets/icons/add-product.png",
+        },
+    ];
+    const tanggal = new Date();
+    const [view, setView] = useState("data semua produk");
     const [id, setId] = useState(null);
     const [namaProduk, setNamaProduk] = useState("");
     const [produkId, setIdProduk] = useState("");
     const [stokProduk, setStokProduk] = useState("");
     const [dataProduk, setDataProduk] = useState([]);
-    const [open, setOpen] = useState(false);
-    const [openCatatan, setOpenCatatan] = useState(false);
+    const [preview, setPreview] = useState(null);
     const {
         data,
         setData,
@@ -31,11 +43,23 @@ function DaftarProduk({ auth }) {
         id_produk: "",
         nama_produk: "",
         harga_produk: "",
+        gambar_produk: null,
         catatan: "",
         produk_id: "",
         user_id: auth.user.id,
     });
-    const ITEMS_PER_PAGE = 12;
+    const handleImageChange = (event) => {
+        const file = event.target.files[0];
+        setData("gambar_produk", file);
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+    const ITEMS_PER_PAGE = 30;
 
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedIds, setSelectedIds] = useState([]);
@@ -97,10 +121,6 @@ function DaftarProduk({ auth }) {
         e.preventDefault();
         post("/create-produk-produksi");
     };
-    const handleSubmitCatatan = (e) => {
-        e.preventDefault();
-        post("/create-catatan-produk-produksi");
-    };
     const handleDelete = () => {
         selectedIds.forEach(async (id) => {
             destroy(`/daftar-produk-produksi/${id}`);
@@ -118,377 +138,286 @@ function DaftarProduk({ auth }) {
                     </div>
                 </PopOver>
             )}
-            <NavbarProduksi navbar={navbarProduksi} title={"Daftar Produk"}>
-                <div className="flex ml-12 pl-2 mt-2">
-                    <div className="w-full relative">
-                        <Table
-                            header={[
-                                "",
-                                "Id Produk",
-                                "Nama Produk",
-                                "Stok Produk",
-                                "Harga Produk",
-                                "Total Produk",
-                                "Minimun Stok",
-                            ]}
-                        >
-                            {selectedIds.length > 0 && (
-                                <div
-                                    className="absolute left-3 -top-7"
-                                    onClick={handleDelete}
-                                >
+            <NavbarProduksi
+                navbar={navbarProduksi}
+                title={"Daftar Produk"}
+                auth={auth}
+            >
+                <div className="m-5 ml-20">
+                    <div className="sticky top-0 z-30 text-sm mb-5 flex gap-2 items-center bg-white w-full py-2">
+                        <Label
+                            className={"bg-[#0C15F7]"}
+                            rotate={"rotate-90"}
+                        />
+                        {navigasi.map((item) => (
+                            <div
+                                key={item}
+                                className={`relative text-[8px] p-2 px-3 rounded-md cursor-pointer mr-5 text-center hover:bg-blue-50 overflow-hidden ${
+                                    view === item.nama ? "bg-blue-50" : ""
+                                }`}
+                                onClick={() => setView(item.nama)}
+                            >
+                                <div className="flex flex-row gap-2 items-center">
                                     <img
-                                        src="/assets/icons/remove.png"
+                                        src={item.icon}
                                         alt=""
-                                        className="w-5 h-5"
+                                        className="w-4 h-4"
                                     />
-                                </div>
-                            )}
-                            {getCurrentPageData().map((i) => (
-                                <tr
-                                    key={i.id}
-                                    className={`hover:bg-blue-50 cursor-pointer ${
-                                        isSelected(i.id) ? "bg-blue-50" : ""
-                                    }`}
-                                >
-                                    <td className="border px-3 py-2 w-10">
-                                        <input
-                                            type="checkbox"
-                                            id={`select-${i.id}`}
-                                            className="rounded outline-0"
-                                            checked={isSelected(i.id)}
-                                            onChange={(e) =>
-                                                handleCheckboxChange(e, i.id)
-                                            }
-                                        />
-                                    </td>
-                                    <td className="px-5 py-2 border font-bold uppercase">
-                                        {i.id_produk}
-                                    </td>
-                                    <td className="px-5 py-2 border w-64">
-                                        <p className="capitalize">
-                                            {i.nama_produk}
-                                        </p>
-                                    </td>
-                                    <td className="px-5 py-2 border">
-                                        {i.stok_produk} pcs
-                                        <span
-                                            className={`relative ml-3 rounded-full text-center p-1 text-[10px] font-normal pl-5 pr-3 ${
-                                                i.stok_produk >
-                                                i.stok_minimum_produk
-                                                    ? "bg-green-500/20 text-green-600"
-                                                    : i.stok_produk ===
-                                                      i.stok_minimum_produk
-                                                    ? "bg-purple-500/20 text-purple-500"
-                                                    : "bg-red-500/20 text-red-600"
-                                            }`}
-                                        >
-                                            {i.stok_produk >
-                                            i.stok_minimum_produk
-                                                ? "+aman"
-                                                : i.stok_produk ===
-                                                  i.stok_minimum_produk
-                                                ? "+cukup"
-                                                : "-kurang"}
-                                            <span
-                                                className={`inset-0 absolute w-2 h-2 top-[6px] left-1 rounded-full animate-pulse ${
-                                                    i.stok_produk >
-                                                    i.stok_minimum_produk
-                                                        ? "bg-green-500"
-                                                        : i.stok_produk ===
-                                                          i.stok_minimum_produk
-                                                        ? "bg-purple-500"
-                                                        : "bg-red-500"
-                                                }`}
-                                            ></span>
-                                        </span>
-                                    </td>
-                                    <td className="px-5 py-2 border">
-                                        <FormaterRupiah
-                                            number={i.harga_produk}
-                                        />
-                                    </td>
-                                    <td className="px-3 py-2 border">
-                                        <div className="relative">
-                                            <FormaterRupiah
-                                                className={`relative ml-3 p-1 ${
-                                                    i.stok_produk >
-                                                    i.stok_minimum_produk
-                                                        ? "text-green-600"
-                                                        : i.stok_produk ===
-                                                          i.stok_minimum_produk
-                                                        ? "text-purple-500"
-                                                        : "text-red-600"
-                                                }`}
-                                                number={
-                                                    i.stok_produk *
-                                                    i.harga_produk
-                                                }
-                                            />
-                                            {!open && !openCatatan && (
-                                                <span className="absolute bottom-0 truncate right-0 rounded-full text-[8px] h-5 w-12 font-normal px-2 bg-green-500/20 text-green-600 overflow-hidden">
-                                                    {i.stok_produk !== 0
-                                                        ? `+${(
-                                                              (i.stok_produk /
-                                                                  i.stok_minimum_produk) *
-                                                              100
-                                                          ).toFixed(0)}`
-                                                        : `0`}
-                                                    %
-                                                </span>
-                                            )}
-                                        </div>
-                                    </td>
-                                    <td className="px-5 py-2 border border-r-0">
-                                        <div className="flex justify-between items-center">
-                                            <p>{i.stok_minimum_produk} pcs</p>
-                                            <div
-                                                className="hover:bg-blue-100 p-2 rounded-md"
-                                                onClick={() => {
-                                                    handleCatatan(i.id),
-                                                        setOpen(false);
-                                                }}
-                                            >
-                                                <Label
-                                                    rotate={`${
-                                                        i.stok_produk >
-                                                        i.stok_minimum_produk
-                                                            ? ""
-                                                            : i.stok_produk ===
-                                                              i.stok_minimum_produk
-                                                            ? ""
-                                                            : "rotate-180"
-                                                    }`}
-                                                    className={`${
-                                                        i.stok_produk >
-                                                        i.stok_minimum_produk
-                                                            ? "bg-green-600"
-                                                            : i.stok_produk ===
-                                                              i.stok_minimum_produk
-                                                            ? "bg-purple-500"
-                                                            : "bg-red-600"
-                                                    }`}
-                                                />
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                            {!openCatatan && (
-                                <p
-                                    className={`bg-yellow-300 group flex p-2 rounded-md absolute -top-9 cursor-pointer ${
-                                        open ? "-right-10" : "right-2"
-                                    }`}
-                                    onClick={() => setOpen(!open)}
-                                >
-                                    <img
-                                        src="/assets/icons/plus.png"
-                                        alt=""
-                                        className={`w-3 h-3 ${
-                                            open ? "rotate-45" : ""
-                                        }`}
-                                    />
-                                </p>
-                            )}
-                        </Table>
-                        <div className="mb-5">
-                            <Pagination
-                                currentPage={currentPage}
-                                totalPages={totalPages}
-                                onPageChange={handlePageChange}
-                                data={dataProduk}
-                                jumlahData={dataProduk.length}
-                                keterangan={"produk"}
-                            />
-                        </div>
-                    </div>
-                    <div
-                        className={`transisition-all duration-500 bg-white border-l h-screen ${
-                            open ? "w-96" : "w-0 opacity-0"
-                        }`}
-                    >
-                        <form
-                            action=""
-                            className={`p-5 ${
-                                open ? "block" : "hidden opacity-0"
-                            }`}
-                            onSubmit={handleSubmit}
-                        >
-                            <h1 className="font-bold pt-5 text-center truncate">
-                                Menambahkan Produk
-                            </h1>
-                            <div className="mt-5 border-t border-dashed pt-5">
-                                <InputLabel htmlFor="email" value="Id Produk" />
-                                <TextInput
-                                    id="id_produk"
-                                    type="text"
-                                    name="id_produk"
-                                    value={data.id_produk}
-                                    className="mt-1 block w-full"
-                                    autoComplete="id_produk"
-                                    isFocused={true}
-                                    onChange={(e) =>
-                                        setData("id_produk", e.target.value)
-                                    }
-                                />
-                                <InputError
-                                    message={errors.id_produk}
-                                    className="mt-2"
-                                />
-                            </div>
-                            <div className="my-4">
-                                <InputLabel
-                                    htmlFor="nama_produk"
-                                    value="Nama Produk"
-                                />
-                                <TextInput
-                                    id="nama_produk"
-                                    type="text"
-                                    name="nama_produk"
-                                    value={data.nama_produk}
-                                    className="mt-1 block w-full"
-                                    autoComplete="nama_produk"
-                                    maxLength={30}
-                                    isFocused={true}
-                                    onChange={(e) =>
-                                        setData("nama_produk", e.target.value)
-                                    }
-                                />
-                                <InputError
-                                    message={errors.nama_produk}
-                                    className="mt-2"
-                                />
-                            </div>
-                            <div className="my-4">
-                                <InputLabel
-                                    htmlFor="email"
-                                    value="Harga Produk"
-                                />
-                                <TextInput
-                                    id="harga_produk"
-                                    type="number"
-                                    name="harga_produk"
-                                    value={data.harga_produk}
-                                    className="mt-1 block w-full"
-                                    autoComplete="harga_produk"
-                                    isFocused={true}
-                                    onChange={(e) =>
-                                        setData("harga_produk", e.target.value)
-                                    }
-                                />
-                                <InputError
-                                    message={errors.harga_produk}
-                                    className="mt-2"
-                                />
-                            </div>
-                            <div className="my-4">
-                                <input
-                                    type="number"
-                                    value={auth.user.id}
-                                    name="user_id"
-                                    className="hidden"
-                                />
-                            </div>
-                            <div className="flex justify-end mt-10">
-                                <PrimaryButton>Tambah</PrimaryButton>
-                            </div>
-                        </form>
-                    </div>
-                    {openCatatan && (
-                        <PopOver>
-                            <div className="-mt-32 w-96">
-                                <div className="flex justify-end p-5">
-                                    <p
-                                        className="bg-yellow-300 group flex p-2 rounded-md w-7 cursor-pointer"
-                                        onClick={() =>
-                                            setOpenCatatan(!openCatatan)
-                                        }
-                                    >
-                                        <img
-                                            src="/assets/icons/plus.png"
-                                            alt=""
-                                            className={`w-3 h-3 ${
-                                                openCatatan ? "rotate-45" : ""
-                                            }`}
-                                        />
+                                    <p className="">
+                                        {item.nama.charAt(0).toUpperCase() +
+                                            item.nama.slice(1)}
                                     </p>
                                 </div>
-
+                                <div
+                                    className={`absolute top-8 w-full h-2 -ml-3 bg-[#0C15F7] transition-opacity duration-300 ${
+                                        view === item.nama
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                    }`}
+                                ></div>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="h-screen overflow-auto pb-32">
+                        {view === "data semua produk" ? (
+                            <div className="w-full relative">
+                                <h1 className="font-black text-2xl uppercase text-center mb-5">
+                                    data tabel semua produk
+                                </h1>
+                                <p className="text-end text-xs">
+                                    <FormateDate data={tanggal} />
+                                </p>
+                                <Table
+                                    header={[
+                                        "",
+                                        "Id Produk",
+                                        "Nama Produk",
+                                        "Stok Produk",
+                                        "Harga Produk",
+                                        "Total Produk",
+                                        "Minimun Stok",
+                                    ]}
+                                >
+                                    {selectedIds.length > 0 && (
+                                        <div
+                                            className="absolute left-3 -top-7"
+                                            onClick={handleDelete}
+                                        >
+                                            <img
+                                                src="/assets/icons/remove.png"
+                                                alt=""
+                                                className="w-5 h-5"
+                                            />
+                                        </div>
+                                    )}
+                                    {getCurrentPageData().map((i) => (
+                                        <tr
+                                            key={i.id}
+                                            className={`hover:bg-blue-50 cursor-pointer ${
+                                                isSelected(i.id)
+                                                    ? "bg-blue-50"
+                                                    : ""
+                                            }`}
+                                        >
+                                            <td className="border px-3 py-2 w-10">
+                                                <input
+                                                    type="checkbox"
+                                                    id={`select-${i.id}`}
+                                                    className="rounded outline-0"
+                                                    checked={isSelected(i.id)}
+                                                    onChange={(e) =>
+                                                        handleCheckboxChange(
+                                                            e,
+                                                            i.id
+                                                        )
+                                                    }
+                                                />
+                                            </td>
+                                            <td className="px-5 py-2 border font-bold uppercase">
+                                                {i.id_produk}
+                                            </td>
+                                            <td className="px-5 py-2 border w-64">
+                                                <p className="capitalize">
+                                                    {i.nama_produk}
+                                                </p>
+                                            </td>
+                                            <td className="px-5 py-2 border">
+                                                {i.stok_produk} pcs
+                                            </td>
+                                            <td className="px-5 py-2 border">
+                                                <FormaterRupiah
+                                                    number={i.harga_produk}
+                                                />
+                                            </td>
+                                            <td className="px-3 py-2 border">
+                                                <div className="relative">
+                                                    <FormaterRupiah
+                                                        number={
+                                                            i.stok_produk *
+                                                            i.harga_produk
+                                                        }
+                                                    />
+                                                </div>
+                                            </td>
+                                            <td className="px-5 py-2 border border-r">
+                                                <div className="flex justify-between items-center">
+                                                    <p>
+                                                        {i.stok_minimum_produk}{" "}
+                                                        pcs
+                                                    </p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </Table>
+                                <div className="mb-5">
+                                    <Pagination
+                                        currentPage={currentPage}
+                                        totalPages={totalPages}
+                                        onPageChange={handlePageChange}
+                                        data={dataProduk}
+                                        jumlahData={dataProduk.length}
+                                        keterangan={"produk"}
+                                    />
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex gap-10">
                                 <form
                                     action=""
-                                    className="shadow-lg p-5 rounded-xl"
-                                    onSubmit={handleSubmitCatatan}
+                                    className="w-96 p-5 border border-dashed border-pink-500 rounded-lg"
+                                    onSubmit={handleSubmit}
                                 >
-                                    <h1 className="font-bold -mt-10 text-center truncate">
-                                        Menambahkan Catatan
-                                    </h1>
-                                    <div className="text-sm mt-5 flex flex-col gap-2 border-b border-dashed pb-5">
-                                        <p className="">
-                                            Penerima:
-                                            <span className="truncate font-normal uppercase text-green-500 bg-green-500/20 p-1 rounded-md text-xs mx-2">
-                                                Tim Gudang
-                                            </span>
-                                        </p>
-                                        <p className="border-t border-dashed pt-2">
-                                            Detail:
-                                        </p>
-                                        <div className="flex justify-between items-center">
-                                            <p className="font-bold">
-                                                {produkId} <br />
-                                                <Label
-                                                    className={"bg-blue-500"}
-                                                />
-                                                <span className="font-normal capitalize">
-                                                    {namaProduk}
-                                                </span>
-                                            </p>
-                                            <p className="mr-10">
-                                                Stok: <br />
-                                                <span className="font-bold">
-                                                    {stokProduk}
-                                                </span>
-                                            </p>
-                                        </div>
+                                    <div className="flex gap-2 items-center font-bold border-b border-dashed pb-3">
+                                        <Label
+                                            className={"bg-green-500"}
+                                            rotate={"rotate-90"}
+                                        />
+                                        <p>Menambahkan produk baru</p>
+                                    </div>
+                                    <div className="my-5">
+                                        <input
+                                            type="file"
+                                            name="image"
+                                            accept="image/*"
+                                            className="mt-2 block w-full text-sm text-gray-500
+                                   file:mr-4 file:py-2 file:px-4
+                                   file:border-0
+                                   file:text-sm file:font-semibold
+                                   file:bg-blue-50 file:text-blue-700
+                                   hover:file:bg-blue-100"
+                                            onChange={handleImageChange}
+                                        />
+                                    </div>
+                                    <div className="mt-5">
+                                        <InputLabel
+                                            htmlFor="email"
+                                            value="Id Produk"
+                                        />
+                                        <TextInput
+                                            id="id_produk"
+                                            type="text"
+                                            name="id_produk"
+                                            value={data.id_produk}
+                                            className="mt-1 block w-full"
+                                            autoComplete="id_produk"
+                                            isFocused={true}
+                                            onChange={(e) =>
+                                                setData(
+                                                    "id_produk",
+                                                    e.target.value
+                                                )
+                                            }
+                                        />
+                                        <InputError
+                                            message={errors.id_produk}
+                                            className="mt-2"
+                                        />
                                     </div>
                                     <div className="my-4">
                                         <InputLabel
                                             htmlFor="nama_produk"
-                                            value="Tambahakan Catatan"
+                                            value="Nama Produk"
                                         />
-                                        <textarea
+                                        <TextInput
+                                            id="nama_produk"
                                             type="text"
-                                            name="catatan"
-                                            id=""
-                                            value={data.catatan}
+                                            name="nama_produk"
+                                            value={data.nama_produk}
+                                            className="mt-1 block w-full"
+                                            autoComplete="nama_produk"
+                                            maxLength={30}
+                                            isFocused={true}
                                             onChange={(e) =>
                                                 setData(
-                                                    "catatan",
+                                                    "nama_produk",
                                                     e.target.value
                                                 )
                                             }
-                                            className="w-full mt-2 rounded-md border-dashed"
-                                            rows={5}
-                                        ></textarea>
-                                        <input
-                                            type="number"
-                                            value={data.produk_id}
-                                            name="produk_id"
-                                            className="hidden"
                                         />
+                                        <InputError
+                                            message={errors.nama_produk}
+                                            className="mt-2"
+                                        />
+                                    </div>
+                                    <div className="my-4">
+                                        <InputLabel
+                                            htmlFor="email"
+                                            value="Harga Produk"
+                                        />
+                                        <TextInput
+                                            id="harga_produk"
+                                            type="number"
+                                            name="harga_produk"
+                                            value={data.harga_produk}
+                                            className="mt-1 block w-full"
+                                            autoComplete="harga_produk"
+                                            isFocused={true}
+                                            onChange={(e) =>
+                                                setData(
+                                                    "harga_produk",
+                                                    e.target.value
+                                                )
+                                            }
+                                        />
+                                        <InputError
+                                            message={errors.harga_produk}
+                                            className="mt-2"
+                                        />
+                                    </div>
+                                    <div className="my-4">
                                         <input
                                             type="number"
-                                            value={data.user_id}
+                                            value={auth.user.id}
                                             name="user_id"
                                             className="hidden"
                                         />
                                     </div>
-                                    <div className="flex justify-end">
-                                        <PrimaryButton>Kirim</PrimaryButton>
+                                    <div className="flex justify-end mt-10">
+                                        <PrimaryButton>Tambah</PrimaryButton>
                                     </div>
                                 </form>
+                                <div className="w-96 h-96">
+                                    <div className="flex gap-2 items-center font-bold border-b border-dashed pb-3">
+                                        <Label
+                                            className={"bg-green-500"}
+                                            rotate={"rotate-90"}
+                                        />
+                                        <p>Preview</p>
+                                    </div>
+                                    <img
+                                        src={`${
+                                            preview === null
+                                                ? "assets/clipboard.png"
+                                                : preview
+                                        }`}
+                                        alt=""
+                                        className="w-full h-full object-cover rounded-lg mx-auto"
+                                    />
+                                </div>
                             </div>
-                        </PopOver>
-                    )}
+                        )}
+                    </div>
                 </div>
             </NavbarProduksi>
         </RoleAccess>

@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "@inertiajs/react";
 import Label from "@/Components/Label";
 import PrimaryButton from "@/Components/PrimaryButton";
 
 const VerifikasiLaporan = ({ dataBahanBaku, id, userId }) => {
     const [jumlah, setJumlah] = useState("");
-    const [dataProduksiDetail, setDataProduksiDetail] = useState([]);
     const [selectedBahanBaku, setSelectedBahanBaku] = useState(null);
     const [filterIds, setFilterIds] = useState([]);
     const { data, setData, post } = useForm({ produksi: [] });
@@ -21,8 +20,10 @@ const VerifikasiLaporan = ({ dataBahanBaku, id, userId }) => {
                 );
                 return;
             }
+
             const existingProduksi = data.produksi.find(
-                (produksi) => produksi.bahan_baku_id === selectedBahanBaku.id
+                (produksi) =>
+                    produksi.bahan_baku_id === selectedBahanBaku.bahan_baku_id
             );
             if (existingProduksi) {
                 alert("Bahan baku ini sudah ditambahkan.");
@@ -31,26 +32,38 @@ const VerifikasiLaporan = ({ dataBahanBaku, id, userId }) => {
 
             const newProduksi = {
                 jumlah_bahan_baku: remainingStock,
-                pemakaian_bahan_baku: jumlahInt,
-                sisa_bahan_baku: remainingStock - jumlahInt,
+                pemakaian_bahan_baku: remainingStock - jumlahInt,
+                sisa_bahan_baku: jumlahInt,
                 laporan_id: parseInt(id),
                 bahan_baku_id: selectedBahanBaku.bahan_baku_id,
                 user_id: parseInt(userId),
             };
 
             setData("produksi", [...data.produksi, newProduksi]);
+            setFilterIds([...filterIds, selectedBahanBaku.bahan_baku_id]);
             setSelectedBahanBaku(null);
             setJumlah("");
         }
     };
 
     const handleRemoveProduksi = (index) => {
+        const removedProduksi = data.produksi[index];
         const newProduksi = data.produksi.filter((_, i) => i !== index);
         setData("produksi", newProduksi);
+
+        if (
+            !newProduksi.some(
+                (p) => p.bahan_baku_id === removedProduksi.bahan_baku_id
+            )
+        ) {
+            setFilterIds(
+                filterIds.filter((id) => id !== removedProduksi.bahan_baku_id)
+            );
+        }
     };
 
     const filterData = dataBahanBaku.filter(
-        (bahanBaku) => !filterIds.includes(bahanBaku.id)
+        (bahanBaku) => !filterIds.includes(bahanBaku.bahan_baku_id)
     );
 
     const calculateTotalUsed = (bahanBaku) => {
@@ -68,27 +81,24 @@ const VerifikasiLaporan = ({ dataBahanBaku, id, userId }) => {
 
     const handleSubmitAll = () => {
         if (data.produksi.length > 0) {
-            console.log(data.produksi);
             post("/create-sisa-bahan-baku-produksi", {
                 produksi: data.produksi,
             });
         }
     };
+
     return (
-        <div className="w-full flex gap-5 ml-8">
-            <div className="w-96 border-r h-screen overflow-auto">
+        <div className="w-full flex gap-5">
+            <div className="w-96 h-screen overflow-auto">
                 <input type="hidden" value={id} />
                 <input type="hidden" value={userId} />
-                <div className="text-sm mb-5 flex gap-2 items-center border-b border-dashed pb-2 pt-5">
-                    <Label className={"bg-green-500"} rotate={"rotate-90"} />
-                    <h1 className="font-bold">Daftar bahan baku</h1>
-                </div>
-                <div className="flex flex-col gap-5 mr-5 pb-32">
+                <div className="flex flex-col gap-5 pb-32">
                     {filterData.map((bahanBaku) => (
                         <div
-                            key={bahanBaku.id}
+                            key={bahanBaku.bahan_baku_id}
                             className={`hover:border-pink-500 border border-dashed p-5 cursor-pointer rounded-md shadow-lg relative ${
-                                selectedBahanBaku?.id === bahanBaku.id
+                                selectedBahanBaku?.bahan_baku_id ===
+                                bahanBaku.bahan_baku_id
                                     ? "border-pink-300 shadow-xl"
                                     : ""
                             }`}
@@ -125,7 +135,8 @@ const VerifikasiLaporan = ({ dataBahanBaku, id, userId }) => {
                                             </span>
                                         </p>
                                     </div>
-                                    {selectedBahanBaku?.id === bahanBaku.id && (
+                                    {selectedBahanBaku?.bahan_baku_id ===
+                                        bahanBaku.bahan_baku_id && (
                                         <div className="">
                                             <input
                                                 type="number"
@@ -152,18 +163,23 @@ const VerifikasiLaporan = ({ dataBahanBaku, id, userId }) => {
                             </div>
                         </div>
                     ))}
+                    {filterData.length === 0 && (
+                        <div className="p-5 border border-dashed border-pink-500 rounded-lg">
+                            <img
+                                src="/assets/icons/check.png"
+                                alt=""
+                                className="w-10 h-10 mx-auto"
+                            />
+                            <p className="text-center mt-5 text-xs text-green-500">
+                                Semua sisa bahan baku sudah dimasukan <br />
+                                kirim semua data untuk melanjutkan
+                            </p>
+                        </div>
+                    )}
                 </div>
             </div>
-            <div className="w-full h-screen overflow-auto mr-10 pb-32">
-                <div className="text-sm flex justify-between items-center mb-5 border-b border-dashed pb-2 pt-5">
-                    <div className="flex gap-2 items-center ">
-                        <Label className={"bg-red-500"} rotate={"rotate-90"} />
-                        <h1 className="font-bold">
-                            Daftar penggunaan bahan baku
-                        </h1>
-                    </div>
-                </div>
-                <div className="relative grid grid-cols-2 gap-5 mr-5">
+            <div className="w-full h-screen overflow-auto pb-32">
+                <div className="relative grid grid-cols-3 gap-5 pb-32">
                     {data.produksi.map((produksi, index) => {
                         const bahanBaku = dataBahanBaku.find(
                             (b) => b.bahan_baku_id === produksi.bahan_baku_id
@@ -209,9 +225,7 @@ const VerifikasiLaporan = ({ dataBahanBaku, id, userId }) => {
                                         <p className="text-xs mt-2">
                                             Penggunaan: <br />
                                             <span className="text-red-500 font-bold">
-                                                {calculateRemainingStock(
-                                                    bahanBaku
-                                                )}{" "}
+                                                {totalUsed}{" "}
                                                 {
                                                     bahanBaku.bahan
                                                         .satuan_bahan_baku
@@ -221,7 +235,9 @@ const VerifikasiLaporan = ({ dataBahanBaku, id, userId }) => {
                                         <p className="text-xs mt-2">
                                             Sisa Stok: <br />
                                             <span className="text-green-500 font-bold">
-                                                {totalUsed}{" "}
+                                                {calculateRemainingStock(
+                                                    bahanBaku
+                                                )}{" "}
                                                 {
                                                     bahanBaku.bahan
                                                         .satuan_bahan_baku
@@ -231,7 +247,7 @@ const VerifikasiLaporan = ({ dataBahanBaku, id, userId }) => {
                                     </div>
                                     <div className="absolute top-2 right-2">
                                         <div
-                                            className="bg-pink-400 p-2 rounded-md text-center  cursor-pointer w-7"
+                                            className="bg-pink-400 p-2 rounded-md text-center cursor-pointer w-7"
                                             onClick={() =>
                                                 handleRemoveProduksi(index)
                                             }
@@ -250,7 +266,7 @@ const VerifikasiLaporan = ({ dataBahanBaku, id, userId }) => {
                 </div>
                 {data.produksi.length !== 0 &&
                     dataBahanBaku.length === data.produksi.length && (
-                        <div className="fixed bottom-10 right-64">
+                        <div className="fixed bottom-10 right-5">
                             <PrimaryButton onClick={handleSubmitAll}>
                                 Kirim Semua Data
                             </PrimaryButton>

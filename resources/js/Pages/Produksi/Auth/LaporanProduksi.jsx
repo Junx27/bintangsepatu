@@ -11,8 +11,20 @@ import CreateLaporan from "@/Pages/Produksi/Layouts/CreateLaporan";
 import FormaterRupiah from "@/Layouts/FormaterRupiah";
 import VerifikasiLaporan from "@/Pages/Produksi/Layouts/VerifikasiLaporan";
 import NavbarProduksi from "../Layouts/NavbarProduksi";
+import Notification from "@/Components/Notification";
 
 function LaporanProduksi({ auth }) {
+    const navigasi = [
+        {
+            nama: "data semua produk diproses",
+            icon: "/assets/icons/list-product.png",
+        },
+        {
+            nama: "verifikasi produksi selesai",
+            icon: "/assets/icons/correct.png",
+        },
+    ];
+    const [view, setView] = useState("data semua produk diproses");
     const [dataProduksi, setDataProduksi] = useState([]);
     const [dataLaporanProduksi, setDataLaporanProduksi] = useState([]);
     const [dataProduksiBahanBaku, setDataProduksiBahanBaku] = useState([]);
@@ -103,170 +115,97 @@ function LaporanProduksi({ auth }) {
     );
     return (
         <RoleAccess auth={auth} role={"produksi"}>
-            <NavbarProduksi navbar={navbarProduksi} title={"Laporan Produksi"}>
-                <div className="mx-12 mt-5">
-                    {createLaporanVerifikasi && (
-                        <div className="ml-7 mt-5 mr-56">
-                            <div className="flex justify-end mb-2">
-                                <div
-                                    className="bg-pink-400 p-2 rounded-md text-center  cursor-pointer w-7"
-                                    onClick={() =>
-                                        setCreateLaporanVerifikasi(false)
-                                    }
-                                >
+            <NavbarProduksi
+                navbar={navbarProduksi}
+                title={"Laporan Produksi"}
+                auth={auth}
+            >
+                <div className="m-5 ml-20 h-screen overflow-auto pb-32">
+                    <div className="sticky top-0 z-30 text-sm mb-5 flex gap-2 items-center bg-white w-full py-2">
+                        <Label
+                            className={"bg-[#0C15F7]"}
+                            rotate={"rotate-90"}
+                        />
+                        {navigasi.map((item) => (
+                            <div
+                                key={item}
+                                className={`relative text-[8px] p-2 px-3 rounded-md cursor-pointer mr-5 text-center hover:bg-blue-50 overflow-hidden ${
+                                    view === item.nama ? "bg-blue-50" : ""
+                                }`}
+                                onClick={() => setView(item.nama)}
+                            >
+                                <div className="flex flex-row gap-2 items-center">
                                     <img
-                                        src="/assets/icons/plus.png"
+                                        src={item.icon}
                                         alt=""
-                                        className="w-3 h-3 rotate-45"
+                                        className="w-4 h-4"
                                     />
+                                    <p className="">
+                                        {item.nama.charAt(0).toUpperCase() +
+                                            item.nama.slice(1)}
+                                    </p>
+                                    <div
+                                        className={`absolute top-8 w-full h-2 -ml-3 bg-[#0C15F7] transition-opacity duration-300 ${
+                                            view === item.nama
+                                                ? "opacity-100"
+                                                : "opacity-0"
+                                        }`}
+                                    ></div>
                                 </div>
-                            </div>
-                            <div className="-mt-10">
-                                <VerifikasiLaporan
-                                    id={idLaporan}
-                                    dataBahanBaku={filterBahanBaku}
-                                    userId={auth.user.id}
+                                <Notification
+                                    nama={item.nama}
+                                    parameter={"data semua produk diproses"}
+                                    data={dataProduksi}
+                                />
+                                <Notification
+                                    nama={item.nama}
+                                    parameter={"verifikasi produksi selesai"}
+                                    data={dataLaporanProduksi}
                                 />
                             </div>
-                        </div>
-                    )}
-                    <div
-                        className={`ml-7 mt-10 mr-56 ${
-                            createLaporanVerifikasi ? "hidden" : "block"
-                        }`}
-                    >
-                        <div className="text-sm mb-5 flex gap-2 items-center border-b border-dashed pb-2">
-                            <Label
-                                className={"bg-purple-500"}
-                                rotate={"rotate-90"}
-                            />
-                            <h1 className="font-bold">
-                                Daftar produksi yang sedang diproses
-                            </h1>
-                        </div>
+                        ))}
+                    </div>
+                    {view === "data semua produk diproses" ? (
                         <div
-                            className={`grid grid-cols-3 gap-5 ${
-                                updateProduksi ? "hidden" : "block"
+                            className={`mt-5 ${
+                                createLaporanVerifikasi ? "hidden" : "block"
                             }`}
                         >
-                            {dataProduksi.map((i) => (
-                                <div
-                                    key={i.id}
-                                    className="hover:border-pink-500 border border-dashed cursor-pointer relative group shadow-lg rounded-xl p-5"
-                                >
-                                    <h1 className="font-black uppercase bg-pink-500/20 text-center p-2 border border-dashed border-pink-500 rounded-md">
-                                        {i.id_produksi}
-                                    </h1>
-                                    <div>
-                                        <h1 className="font-black border-b border-dashed py-2">
-                                            ID: {i.id_produk}
-                                        </h1>
-                                        <div>
-                                            <Label className={"bg-red-500"} />
-                                            <p className="capitalize">
-                                                {i.nama_produk}
-                                                <span className="bg-purple-500/20 text-purple-500 lowercase relative ml-3 rounded-full text-center p-1 text-[10px] font-normal px-3">
-                                                    {i.status_produksi}
-                                                </span>
-                                            </p>
-                                        </div>
-
-                                        <div className="flex justify-between">
-                                            <div className="mt-3 text-xs">
-                                                <p>
-                                                    Tanggal Mulai: <br />
-                                                    <span className="font-bold">
-                                                        {i.tanggal_mulai}
-                                                    </span>
-                                                </p>
-                                            </div>
-                                            <div className="mt-3 text-xs">
-                                                <p>
-                                                    Estimasi Selesai: <br />
-                                                    <span className="font-bold">
-                                                        {i.estimasi_selesai}
-                                                    </span>
-                                                </p>
-                                            </div>
-                                            <div className="mt-3 text-xs">
-                                                <p>
-                                                    QTY: <br />
-                                                    <span className="font-bold">
-                                                        {i.jumlah_produksi}
-                                                    </span>
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div
+                                className={`grid grid-cols-4 gap-5 pb-32 ${
+                                    updateProduksi ? "hidden" : "block"
+                                }`}
+                            >
+                                {dataProduksi.map((i) => (
                                     <div
-                                        className="group-hover:block hidden absolute z-20 top-2 right-2 cursor-pointer"
-                                        onClick={() => handleBahanBaku(i.id)}
+                                        key={i.id}
+                                        className="hover:border-pink-500 border border-dashed cursor-pointer relative group shadow-lg rounded-xl p-5"
                                     >
-                                        <img
-                                            src="/assets/icons/plus.png"
-                                            alt=""
-                                            className="w-7 h-7 bg-green-300 p-2 rounded-md"
-                                        />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                        {updateProduksi && (
-                            <div className="w-full h-screen pb-32 overflow-auto">
-                                <div
-                                    className={`${
-                                        createLaporan ? "hidden" : "block"
-                                    }`}
-                                >
-                                    <div className="hover:border-pink-500 border border-dashed cursor-pointer relative group shadow-lg rounded-xl p-5">
-                                        <div className="flex justify-end mb-2">
-                                            <div
-                                                className="bg-pink-400 p-2 rounded-md text-center  cursor-pointer w-7"
-                                                onClick={() =>
-                                                    setUpdateProduksi(false)
-                                                }
-                                            >
-                                                <img
-                                                    src="/assets/icons/plus.png"
-                                                    alt=""
-                                                    className="w-3 h-3 rotate-45"
-                                                />
-                                            </div>
-                                        </div>
-                                        <h1 className="font-black uppercase bg-green-500/20 text-center p-2 border border-dashed border-green-500 rounded-md">
-                                            {dataProduksiDetail.id_produksi}
+                                        <h1 className="font-black uppercase bg-pink-500/20 text-center p-2 border border-dashed border-pink-500 rounded-md">
+                                            {i.id_produksi}
                                         </h1>
-
                                         <div>
                                             <h1 className="font-black border-b border-dashed py-2">
-                                                ID:{" "}
-                                                {dataProduksiDetail.id_produk}
+                                                ID: {i.id_produk}
                                             </h1>
                                             <div>
                                                 <Label
                                                     className={"bg-red-500"}
                                                 />
                                                 <p className="capitalize">
-                                                    {
-                                                        dataProduksiDetail.nama_produk
-                                                    }
+                                                    {i.nama_produk}
                                                     <span className="bg-purple-500/20 text-purple-500 lowercase relative ml-3 rounded-full text-center p-1 text-[10px] font-normal px-3">
-                                                        {
-                                                            dataProduksiDetail.status_produksi
-                                                        }
+                                                        {i.status_produksi}
                                                     </span>
                                                 </p>
                                             </div>
+
                                             <div className="flex justify-between">
                                                 <div className="mt-3 text-xs">
                                                     <p>
                                                         Tanggal Mulai: <br />
                                                         <span className="font-bold">
-                                                            <FormateDate
-                                                                data={
-                                                                    dataProduksiDetail.tanggal_mulai
-                                                                }
-                                                            />
+                                                            {i.tanggal_mulai}
                                                         </span>
                                                     </p>
                                                 </div>
@@ -274,11 +213,7 @@ function LaporanProduksi({ auth }) {
                                                     <p>
                                                         Estimasi Selesai: <br />
                                                         <span className="font-bold">
-                                                            <FormateDate
-                                                                data={
-                                                                    dataProduksiDetail.estimasi_selesai
-                                                                }
-                                                            />
+                                                            {i.estimasi_selesai}
                                                         </span>
                                                     </p>
                                                 </div>
@@ -286,123 +221,261 @@ function LaporanProduksi({ auth }) {
                                                     <p>
                                                         QTY: <br />
                                                         <span className="font-bold">
-                                                            {
-                                                                dataProduksiDetail.jumlah_produksi
-                                                            }
+                                                            {i.jumlah_produksi}
                                                         </span>
                                                     </p>
                                                 </div>
                                             </div>
                                         </div>
-                                        <Table
-                                            header={[
-                                                "no",
-                                                "id bahan baku",
-                                                "nama bahan baku",
-                                                "stok sebelum",
-                                                "penggunaan stok",
-                                                "sisa stok",
-                                                "stok sekarang",
-                                                "harga bahan baku",
-                                                "sub total",
-                                            ]}
+                                        <div
+                                            className="group-hover:block hidden absolute z-20 top-2 right-2 cursor-pointer"
+                                            onClick={() =>
+                                                handleBahanBaku(i.id)
+                                            }
                                         >
-                                            {groupedData.map((item, index) => (
-                                                <tr
-                                                    className=""
-                                                    key={item.id_bahan_baku}
+                                            <img
+                                                src="/assets/icons/plus.png"
+                                                alt=""
+                                                className="w-7 h-7 bg-green-300 p-2 rounded-md"
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            {updateProduksi && (
+                                <div className="w-full h-screen pb-32 overflow-auto">
+                                    <div
+                                        className={`${
+                                            createLaporan ? "hidden" : "block"
+                                        }`}
+                                    >
+                                        <div className="hover:border-pink-500 border border-dashed cursor-pointer relative group shadow-lg rounded-xl p-5">
+                                            <div className="flex justify-end mb-2">
+                                                <div
+                                                    className="bg-pink-400 p-2 rounded-md text-center  cursor-pointer w-7"
+                                                    onClick={() =>
+                                                        setUpdateProduksi(false)
+                                                    }
                                                 >
-                                                    <td className="px-3 py-2 border text-center">
-                                                        {index + 1}
+                                                    <img
+                                                        src="/assets/icons/plus.png"
+                                                        alt=""
+                                                        className="w-3 h-3 rotate-45"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <h1 className="font-black uppercase bg-green-500/20 text-center p-2 border border-dashed border-green-500 rounded-md">
+                                                {dataProduksiDetail.id_produksi}
+                                            </h1>
+
+                                            <div>
+                                                <h1 className="font-black border-b border-dashed py-2">
+                                                    ID:{" "}
+                                                    {
+                                                        dataProduksiDetail.id_produk
+                                                    }
+                                                </h1>
+                                                <div>
+                                                    <Label
+                                                        className={"bg-red-500"}
+                                                    />
+                                                    <p className="capitalize">
+                                                        {
+                                                            dataProduksiDetail.nama_produk
+                                                        }
+                                                        <span className="bg-purple-500/20 text-purple-500 lowercase relative ml-3 rounded-full text-center p-1 text-[10px] font-normal px-3">
+                                                            {
+                                                                dataProduksiDetail.status_produksi
+                                                            }
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <div className="mt-3 text-xs">
+                                                        <p>
+                                                            Tanggal Mulai:{" "}
+                                                            <br />
+                                                            <span className="font-bold">
+                                                                <FormateDate
+                                                                    data={
+                                                                        dataProduksiDetail.tanggal_mulai
+                                                                    }
+                                                                />
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                    <div className="mt-3 text-xs">
+                                                        <p>
+                                                            Estimasi Selesai:{" "}
+                                                            <br />
+                                                            <span className="font-bold">
+                                                                <FormateDate
+                                                                    data={
+                                                                        dataProduksiDetail.estimasi_selesai
+                                                                    }
+                                                                />
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                    <div className="mt-3 text-xs">
+                                                        <p>
+                                                            QTY: <br />
+                                                            <span className="font-bold">
+                                                                {
+                                                                    dataProduksiDetail.jumlah_produksi
+                                                                }
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <Table
+                                                header={[
+                                                    "no",
+                                                    "id bahan baku",
+                                                    "nama bahan baku",
+                                                    "stok sebelum",
+                                                    "penggunaan stok",
+                                                    "sisa stok",
+                                                    "stok sekarang",
+                                                    "harga bahan baku",
+                                                    "sub total",
+                                                ]}
+                                            >
+                                                {groupedData.map(
+                                                    (item, index) => (
+                                                        <tr
+                                                            className=""
+                                                            key={
+                                                                item.id_bahan_baku
+                                                            }
+                                                        >
+                                                            <td className="px-3 py-2 border text-center">
+                                                                {index + 1}
+                                                            </td>
+                                                            <td className="px-3 py-2 border">
+                                                                {
+                                                                    item.id_bahan_baku
+                                                                }
+                                                            </td>
+                                                            <td className="px-3 py-2 border">
+                                                                {
+                                                                    item.nama_bahan_baku
+                                                                }
+                                                            </td>
+                                                            <td className="px-3 py-2 border">
+                                                                {
+                                                                    item.stok_bahan_baku
+                                                                }
+                                                            </td>
+                                                            <td className="px-3 py-2 border">
+                                                                {
+                                                                    item.jumlah_bahan_baku
+                                                                }
+                                                            </td>
+                                                            <td className="px-3 py-2 border">
+                                                                {item.sisa}
+                                                            </td>
+                                                            <td className="px-3 py-2 border">
+                                                                {
+                                                                    item.stok_sekarang
+                                                                }
+                                                            </td>
+                                                            <td className="px-3 py-2 border text-end">
+                                                                {
+                                                                    item.harga_bahan_baku
+                                                                }
+                                                            </td>
+                                                            <td className="px-3 py-2 border text-end">
+                                                                {item.sub_total}
+                                                            </td>
+                                                        </tr>
+                                                    )
+                                                )}
+                                                <tr className="border">
+                                                    <td
+                                                        colSpan={8}
+                                                        className="text-end px-3 py-2"
+                                                    >
+                                                        Total biaya produksi:
                                                     </td>
-                                                    <td className="px-3 py-2 border">
-                                                        {item.id_bahan_baku}
-                                                    </td>
-                                                    <td className="px-3 py-2 border">
-                                                        {item.nama_bahan_baku}
-                                                    </td>
-                                                    <td className="px-3 py-2 border">
-                                                        {item.stok_bahan_baku}
-                                                    </td>
-                                                    <td className="px-3 py-2 border">
-                                                        {item.jumlah_bahan_baku}
-                                                    </td>
-                                                    <td className="px-3 py-2 border">
-                                                        {item.sisa}
-                                                    </td>
-                                                    <td className="px-3 py-2 border">
-                                                        {item.stok_sekarang}
-                                                    </td>
-                                                    <td className="px-3 py-2 border text-end">
-                                                        {item.harga_bahan_baku}
-                                                    </td>
-                                                    <td className="px-3 py-2 border text-end">
-                                                        {item.sub_total}
+                                                    <td className="border px-3 py-2 text-end">
+                                                        {totalBiaya}
                                                     </td>
                                                 </tr>
-                                            ))}
-                                            <tr className="border">
-                                                <td
-                                                    colSpan={8}
-                                                    className="text-end px-3 py-2"
-                                                >
-                                                    Total biaya produksi:
-                                                </td>
-                                                <td className="border px-3 py-2 text-end">
-                                                    {totalBiaya}
-                                                </td>
-                                            </tr>
-                                        </Table>
+                                            </Table>
 
-                                        <div className="text-xs flex justify-end mt-5">
-                                            <div>
-                                                <p>Pembuat:</p>
-                                                <p className="font-bold capitalize">
-                                                    {namaPembuat}
-                                                </p>
-                                                <FormateDate
-                                                    data={
-                                                        dataProduksiDetail.estimasi_selesai
-                                                    }
-                                                />
+                                            <div className="text-xs flex justify-end mt-5">
+                                                <div>
+                                                    <p>Pembuat:</p>
+                                                    <p className="font-bold capitalize">
+                                                        {namaPembuat}
+                                                    </p>
+                                                    <FormateDate
+                                                        data={
+                                                            dataProduksiDetail.estimasi_selesai
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div
+                                                className="flex justify-end mt-5"
+                                                onClick={() =>
+                                                    handleLaporan(
+                                                        dataProduksiDetail.id
+                                                    )
+                                                }
+                                            >
+                                                <PrimaryButton>
+                                                    Buat laporan
+                                                </PrimaryButton>
                                             </div>
                                         </div>
+                                    </div>
+
+                                    {createLaporan && (
+                                        <CreateLaporan
+                                            id={produksiId}
+                                            biayaProduksi={totalBiaya}
+                                        />
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="h-screen overflow-auto">
+                            {createLaporanVerifikasi && (
+                                <div className="">
+                                    <div className="absolute top-6 right-5 z-40">
                                         <div
-                                            className="flex justify-end mt-5"
+                                            className="bg-pink-400 p-2 rounded-md text-center  cursor-pointer w-7"
                                             onClick={() =>
-                                                handleLaporan(
-                                                    dataProduksiDetail.id
+                                                setCreateLaporanVerifikasi(
+                                                    false
                                                 )
                                             }
                                         >
-                                            <PrimaryButton>
-                                                Buat laporan
-                                            </PrimaryButton>
+                                            <img
+                                                src="/assets/icons/plus.png"
+                                                alt=""
+                                                className="w-3 h-3 rotate-45"
+                                            />
                                         </div>
                                     </div>
+                                    <div className="">
+                                        <VerifikasiLaporan
+                                            id={idLaporan}
+                                            dataBahanBaku={filterBahanBaku}
+                                            userId={auth.user.id}
+                                        />
+                                    </div>
                                 </div>
-
-                                {createLaporan && (
-                                    <CreateLaporan
-                                        id={produksiId}
-                                        biayaProduksi={totalBiaya}
-                                    />
-                                )}
-                            </div>
-                        )}
-                    </div>
-                    <div className="fixed right-0 z-30 top-12 h-screen overflow-auto">
-                        <div className="w-64 h-screen bg-white p-5 pt-10 border-l">
-                            <div className="text-sm mb-5 flex gap-2 items-center border-b border-dashed pb-2">
-                                <Label
-                                    className={"bg-red-500"}
-                                    rotate={"rotate-90"}
-                                />
-                                <h1 className="font-bold">
-                                    Verifikasi laporan produksi
-                                </h1>
-                            </div>
-                            <div className="flex flex-col gap-5 pb-32">
+                            )}
+                            <div
+                                className={`grid grid-cols-4 gap-5 pb-32 ${
+                                    createLaporanVerifikasi ? "hidden" : "block"
+                                }`}
+                            >
                                 {dataLaporanProduksi.map((i) => (
                                     <div
                                         key={i.id}
@@ -475,7 +548,7 @@ function LaporanProduksi({ auth }) {
                                 ))}
                             </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </NavbarProduksi>
         </RoleAccess>

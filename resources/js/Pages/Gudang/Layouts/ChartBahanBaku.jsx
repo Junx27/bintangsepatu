@@ -10,7 +10,7 @@ function ChartBahanBaku({ analisis }) {
     const idBahanBaku = _.groupBy(analisis, "id_bahan_baku");
     const labels = Object.keys(idBahanBaku).map((id) => {
         const bahanBaku = idBahanBaku[id][0];
-        return `${id} - ${bahanBaku.nama_bahan_baku}`;
+        return `${bahanBaku.nama_bahan_baku}`;
     });
     const labelsValue = Object.values(idBahanBaku).map((group) =>
         group.reduce((total, item) => total + item.stok_bahan_baku, 0)
@@ -79,6 +79,9 @@ function ChartBahanBaku({ analisis }) {
 
     return (
         <div>
+            <h1 className="font-black text-2xl uppercase text-center mb-10">
+                data grafik stok bahan baku
+            </h1>
             <canvas ref={chartRef} />
         </div>
     );

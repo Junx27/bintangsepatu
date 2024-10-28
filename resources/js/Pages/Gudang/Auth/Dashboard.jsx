@@ -1,6 +1,6 @@
 import RoleAccess from "@/Middleware/RoleAcces";
 import { Link } from "@inertiajs/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { navbarGudang } from "../Data/NavbarGudang";
 import NavbarGudang from "../Layouts/NavbarGudang";
 import ChartProduk from "../Layouts/ChartProduk";
@@ -10,6 +10,7 @@ import ChartProdukMasuk from "../Layouts/ChartProdukMasuk";
 import ChartBahanBakuMasuk from "../Layouts/ChartBahanBakuMasuk";
 
 function Dashboard({ auth }) {
+    const pdfRef = useRef();
     const [dataProduk, setDataProduk] = useState([]);
     const [dataBahanBaku, setDataBahanBaku] = useState([]);
     const [dataProdukMasuk, setDataProdukMasuk] = useState([]);
@@ -42,17 +43,24 @@ function Dashboard({ auth }) {
     }, []);
     return (
         <RoleAccess auth={auth} role={"gudang"}>
-            <NavbarGudang navbar={navbarGudang} title={"Dashboard Gudang"}>
+            <NavbarGudang
+                navbar={navbarGudang}
+                title={"Dashboard Gudang"}
+                pdfRef={pdfRef}
+                fileName={"Dashboard.pdf"}
+                layout={"l"}
+            >
                 <div className="fixed right-0 h-screen overflow-auto w-64 bg-red-500"></div>
-                <div className="flex gap-10 m-10 ml-20 mr-64 pr-5">
+                <div
+                    className="h-screen overflow-auto flex flex-col gap-32 pt-20 ml-20 mr-64 px-5 pb-32"
+                    ref={pdfRef}
+                >
                     <div className="w-full">
                         <ChartProdukMasuk analisis={dataProdukMasuk} />
                     </div>
                     <div className="w-full">
                         <ChartBahanBakuMasuk analisis={dataBahanBakuMasuk} />
                     </div>
-                </div>
-                <div className="flex gap-10 m-10 ml-20 mr-64 pr-5">
                     <div className="w-full">
                         <ChartProduk analisis={dataProduk} />
                     </div>

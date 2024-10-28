@@ -14,6 +14,7 @@ class Produk extends Model
         'harga_produk',
         'stok_produk',
         'stok_minimum_produk',
+        'gambar_produk',
         'user_id',
     ];
     public function user()

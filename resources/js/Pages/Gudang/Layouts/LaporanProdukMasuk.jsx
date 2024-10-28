@@ -101,7 +101,7 @@ function LaporanProdukMasuk() {
 
     return (
         <div className="">
-            <div className="relative mb-10 border-b-4 border-black border-double pb-3">
+            {/* <div className="relative mb-10 border-b-4 border-black border-double pb-3">
                 <div className="absolute top-2">
                     <img src="/assets/logo.png" alt="" className="w-8 h-8" />
                 </div>
@@ -117,7 +117,7 @@ function LaporanProdukMasuk() {
                 <p className="absolute top-2 right-5 text-xs">
                     <FormateDate data={tanggal} />
                 </p>
-            </div>
+            </div> */}
             <Table
                 header={[
                     "no",

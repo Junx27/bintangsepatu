@@ -16,4 +16,8 @@ class DataBahanBakuMasuk extends Model
         'bahan_baku_id',
         'user_id',
     ];
+    public function bahan()
+    {
+        return $this->belongsTo(BahanBaku::class, "bahan_baku_id");
+    }
 }

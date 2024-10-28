@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('role');
+            $table->string('image');
             $table->string('status_pengguna')->default("belum diverifikasi");
             $table->rememberToken();
             $table->timestamps();

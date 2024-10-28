@@ -9,6 +9,7 @@ function DaftarRepair({ auth }) {
             <NavbarProduksi
                 navbar={navbarProduksi}
                 title={"Daftar Repair"}
+                auth={auth}
             ></NavbarProduksi>
         </RoleAccess>
     );
