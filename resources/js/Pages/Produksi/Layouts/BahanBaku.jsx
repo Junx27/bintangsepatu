@@ -89,7 +89,7 @@ const BahanBaku = ({ dataBahanBaku, id, userId }) => {
         <div className="w-full flex gap-5">
             <div className="w-96 h-screen overflow-auto pb-32">
                 <div className="absolute top-2 z-30 right-0">
-                    <div className="flex justify-between gap-5 items-center bg-pink-500/20 text-center p-2 border border-dashed border-pink-500 rounded-md">
+                    <div className="flex justify-between gap-5 items-center bg-pink-500/20 text-center p-2 rounded-md">
                         <h1 className="w-96 font-black uppercase">
                             {dataProduksiDetail.id_produksi}
                         </h1>

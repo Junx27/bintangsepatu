@@ -16,6 +16,7 @@ import NavbarProduksi from "../Layouts/NavbarProduksi";
 import Notification from "@/Components/Notification";
 
 function Dashboard({ auth }) {
+    const tanggal = new Date();
     const pdfRef = useRef();
     const navigasi = [
         {
@@ -235,10 +236,18 @@ function Dashboard({ auth }) {
                                             />
                                         </div>
                                     ) : view === "tabel produksi terkirim" ? (
-                                        <div className="mb-32" ref={pdfRef}>
-                                            <h1 className="font-black text-2xl uppercase text-center mb-10">
-                                                data tabel produksi terkirim
+                                        <div className="w-full relative border p-5 rounded-md">
+                                            <h1 className="font-black text-xl uppercase text-center">
+                                                data tabel semua produksi
                                             </h1>
+                                            <h2 className="text-center font-bold text-sm">
+                                                Sistem Informasi Inventori dan
+                                                Produksi (SIIP)
+                                            </h2>
+                                            <p className="text-center text-xs mb-5 border-b-4 border-double border-black pb-2">
+                                                Tanggal:{" "}
+                                                <FormateDate data={tanggal} />
+                                            </p>
                                             <Table
                                                 header={[
                                                     "no",
@@ -325,9 +334,9 @@ function Dashboard({ auth }) {
                                                         (i) => (
                                                             <div
                                                                 key={i.id}
-                                                                className="hover:border-pink-500 border border-dashed cursor-pointer relative group shadow-lg rounded-xl p-5"
+                                                                className="cursor-pointer relative group shadow-lg rounded-xl p-5"
                                                             >
-                                                                <h1 className="font-bold p-2 border border-dashed border-green-500 rounded-md text-center bg-green-500/20">
+                                                                <h1 className="font-bold p-2 rounded-md text-center bg-green-500/20">
                                                                     {
                                                                         i.id_laporan
                                                                     }
@@ -395,7 +404,7 @@ function Dashboard({ auth }) {
                                                                     </div>
                                                                 </div>
                                                                 <div
-                                                                    className="group-hover:block hidden absolute z-20 top-2 right-2 cursor-pointer"
+                                                                    className="text-[10px] group-hover:block hidden absolute z-20 bottom-32 mb-3 right-5 cursor-pointer bg-pink-500/20 p-2 rounded-md"
                                                                     onClick={() =>
                                                                         handleLaporan(
                                                                             i.id,
@@ -403,11 +412,10 @@ function Dashboard({ auth }) {
                                                                         )
                                                                     }
                                                                 >
-                                                                    <img
-                                                                        src="/assets/icons/plus.png"
-                                                                        alt=""
-                                                                        className="w-7 h-7 bg-green-300 p-2 rounded-md"
-                                                                    />
+                                                                    <p>
+                                                                        Buat
+                                                                        pengiriman
+                                                                    </p>
                                                                 </div>
                                                             </div>
                                                         )
@@ -424,7 +432,7 @@ function Dashboard({ auth }) {
                         <div className="mx-5 pl-[60px] mt-10">
                             <div className="w-full h-screen pb-32 overflow-auto">
                                 <div className="">
-                                    <div className="hover:border-pink-500 border border-dashed cursor-pointer relative group shadow-lg rounded-xl p-5">
+                                    <div className="border cursor-pointer relative group shadow-lg rounded-xl p-5">
                                         <div className="flex justify-end mb-2">
                                             <div
                                                 className="bg-pink-400 p-2 rounded-md text-center  cursor-pointer w-7"
@@ -520,7 +528,7 @@ function Dashboard({ auth }) {
                                             </div>
                                         </div>
                                         <div className="mt-2 mb-5">
-                                            <h1 className="font-black uppercase bg-pink-500/20 text-center p-2 border border-dashed border-pink-500 rounded-md">
+                                            <h1 className="font-black uppercase bg-pink-500/20 text-center p-2 rounded-md">
                                                 penggunaan bahan baku
                                             </h1>
                                         </div>
@@ -594,7 +602,7 @@ function Dashboard({ auth }) {
                                             </tr>
                                         </Table>
                                         <div className="mt-5 mb-5">
-                                            <h1 className="font-black uppercase bg-yellow-500/20 text-center p-2 border border-dashed border-yellow-500 rounded-md">
+                                            <h1 className="font-black uppercase bg-yellow-500/20 text-center p-2 rounded-md">
                                                 sisa bahan baku
                                             </h1>
                                         </div>
@@ -675,7 +683,7 @@ function Dashboard({ auth }) {
                                         </Table>
 
                                         <div className="mt-5 mb-5">
-                                            <h1 className="font-black uppercase bg-green-500/20 text-center p-2 border border-dashed border-green-500 rounded-md">
+                                            <h1 className="font-black uppercase bg-green-500/20 text-center p-2 rounded-md">
                                                 akumulasi biaya produksi
                                             </h1>
                                         </div>
@@ -760,7 +768,7 @@ function Dashboard({ auth }) {
                                 </div>
                                 {createLaporan && (
                                     <PopOver>
-                                        <div className="border border-dashed border-pink-500 p-5 rounded-md">
+                                        <div className="border p-5 rounded-md shadow-lg">
                                             <div className="flex justify-end mb-2">
                                                 <div
                                                     className="bg-pink-400 p-2 rounded-md text-center  cursor-pointer w-7"

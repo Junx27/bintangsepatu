@@ -82,6 +82,32 @@ class ProduksiController extends Controller
         Produk::create($validated);
         return Inertia::location("/daftar-produk-produksi");
     }
+
+    public function updateProduk(Request $request, String $id)
+    {
+        $validated = $request->validate([
+            "id_produk" => 'required',
+            "nama_produk" => 'required',
+            "harga_produk" => 'required',
+            "gambar_produk" => 'required',
+        ]);
+        $produk = Produk::findOrFail($id);
+        $existingRecord = Produk::where('id_produk', $validated['id_produk'])->first();
+
+        if ($existingRecord) {
+            return back()->withErrors(['message' => 'Data id produk sudah ada, gagal menambahkan data produk!, coba dengan id produk yang berbeda']);
+        }
+        if ($request->hasFile('gambar_produk')) {
+            if ($produk->gambar_produk) {
+                Storage::disk('public')->delete($produk->gambar_produk);
+            }
+            $validated['gambar_produk'] = $request->file('gambar_produk')->store('gambar_produk', 'public');
+        }
+
+        $produk->update($validated);
+        return Inertia::location("/daftar-produk-produksi");
+    }
+
     public function deleteProduk(String $id)
     {
         $data = Produk::findOrFail($id);

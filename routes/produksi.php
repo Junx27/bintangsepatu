@@ -13,6 +13,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post("/create-data-produksi-produksi", [ProduksiController::class, "createDataProduksi"])->name('create.dataproduksi.produksi');
     Route::delete("/daftar-produk-produksi/{id}", [ProduksiController::class, "deleteProduk"])->name('delete.produk.produksi');
     Route::post("/create-produk-produksi", [ProduksiController::class, "createProduk"])->name('create.produk.produksi');
+    Route::put("/update-produk-produksi/{id}", [ProduksiController::class, "updateProduk"])->name('update.produk.produksi');
     Route::post("/create-laporan-produksi", [ProduksiController::class, "createLaporan"])->name('create.laporan.produksi');
     Route::post("/create-produksi-produksi", [ProduksiController::class, "createProduksi"])->name('create.produksi.produksi');
     Route::get("/daftar-repair-produksi", [ProduksiController::class, "daftarRepair"])->name('daftar.repair.produksi');

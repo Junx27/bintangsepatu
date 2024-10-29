@@ -166,7 +166,7 @@ function DaftarProduksi({ auth }) {
                                 {dataProduk.map((i) => (
                                     <div
                                         key={i.id}
-                                        className="hover:border-pink-500 border border-dashed cursor-pointer relative group shadow-lg rounded-xl p-5"
+                                        className="cursor-pointer relative group shadow-lg rounded-xl p-5"
                                     >
                                         <div className="w-full h-32">
                                             <img
@@ -260,25 +260,21 @@ function DaftarProduksi({ auth }) {
                                             </div>
                                         </div>
                                         <div
-                                            className="group-hover:block hidden absolute z-20 top-2 right-2 cursor-pointer"
+                                            className="text-[10px] group-hover:block hidden absolute z-20 bottom-20 mb-5 right-5 cursor-pointer bg-green-300 p-2 rounded-md"
                                             onClick={(e) =>
                                                 handleCreateProduksi(i.id)
                                             }
                                         >
-                                            <img
-                                                src="/assets/icons/plus.png"
-                                                alt=""
-                                                className="w-7 h-7 bg-green-300 p-2 rounded-md"
-                                            />
+                                            <p>Buat produksi</p>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                             {createProduksi && (
-                                <div className="w-96 p-5 border border-dashed border-pink-500 rounded-lg">
+                                <div className="w-96 p-5 border rounded-lg">
                                     <div className="flex justify-end">
                                         <div
-                                            className="bg-yellow-300 p-2 rounded-md text-center  cursor-pointer w-7"
+                                            className="bg-pink-500 p-2 rounded-md text-center  cursor-pointer w-7"
                                             onClick={() =>
                                                 setCreateProduksi(false)
                                             }
@@ -292,7 +288,7 @@ function DaftarProduksi({ auth }) {
                                     </div>
                                     <div className="">
                                         <div className="text-center">
-                                            <div className="border border-green-500 bg-green-500/20 border-dashed mt-3 p-2 rounded-lg">
+                                            <div className="bg-green-500/20 border-dashed mt-3 p-2 rounded-lg">
                                                 <p className="font-black mb-1">
                                                     {data.id_produk}
                                                 </p>
@@ -476,9 +472,9 @@ function DaftarProduksi({ auth }) {
                                         {dataProduksi.map((i) => (
                                             <div
                                                 key={i.id}
-                                                className="hover:border-pink-500 border border-dashed cursor-pointer relative group shadow-lg rounded-xl p-5"
+                                                className="cursor-pointer relative group shadow-lg rounded-xl p-5"
                                             >
-                                                <h1 className="font-black uppercase bg-yellow-500/20 text-center p-2 border border-dashed border-yellow-500 rounded-md mb-2">
+                                                <h1 className="font-black uppercase bg-yellow-500/20 text-center p-2 rounded-md mb-2">
                                                     {i.id_produksi}
                                                 </h1>
                                                 <h1 className="font-black border-b border-dashed pb-2">
@@ -531,16 +527,12 @@ function DaftarProduksi({ auth }) {
                                                     </div>
                                                 </div>
                                                 <div
-                                                    className="group-hover:block hidden absolute z-20 top-2 right-2 cursor-pointer"
+                                                    className="text-[10px] group-hover:block hidden absolute z-20 bottom-20 mb-5 right-5 cursor-pointer bg-green-300 p-2 rounded-md"
                                                     onClick={() =>
                                                         handleBahanBaku(i.id)
                                                     }
                                                 >
-                                                    <img
-                                                        src="/assets/icons/plus.png"
-                                                        alt=""
-                                                        className="w-7 h-7 bg-green-300 p-2 rounded-md"
-                                                    />
+                                                    <p>Tambah bahan baku</p>
                                                 </div>
                                             </div>
                                         ))}

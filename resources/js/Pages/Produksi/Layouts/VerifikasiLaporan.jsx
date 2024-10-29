@@ -96,10 +96,10 @@ const VerifikasiLaporan = ({ dataBahanBaku, id, userId }) => {
                     {filterData.map((bahanBaku) => (
                         <div
                             key={bahanBaku.bahan_baku_id}
-                            className={`hover:border-pink-500 border border-dashed p-5 cursor-pointer rounded-md shadow-lg relative ${
+                            className={`border p-5 cursor-pointer rounded-md shadow-lg relative ${
                                 selectedBahanBaku?.bahan_baku_id ===
                                 bahanBaku.bahan_baku_id
-                                    ? "border-pink-300 shadow-xl"
+                                    ? "shadow-xl"
                                     : ""
                             }`}
                             onClick={() => setSelectedBahanBaku(bahanBaku)}
@@ -141,7 +141,7 @@ const VerifikasiLaporan = ({ dataBahanBaku, id, userId }) => {
                                             <input
                                                 type="number"
                                                 value={jumlah}
-                                                className="w-[92px] rounded-md text-xs border-pink-500 border-dashed"
+                                                className="w-[92px] rounded-md text-xs border"
                                                 placeholder="Sisa stok"
                                                 onChange={(e) =>
                                                     setJumlah(e.target.value)
@@ -164,7 +164,7 @@ const VerifikasiLaporan = ({ dataBahanBaku, id, userId }) => {
                         </div>
                     ))}
                     {filterData.length === 0 && (
-                        <div className="p-5 border border-dashed border-pink-500 rounded-lg">
+                        <div className="p-5 border rounded-lg">
                             <img
                                 src="/assets/icons/check.png"
                                 alt=""
@@ -191,7 +191,7 @@ const VerifikasiLaporan = ({ dataBahanBaku, id, userId }) => {
                         return (
                             <div
                                 key={index}
-                                className="hover:border-pink-500 border border-dashed cursor-pointer p-5 shadow-lg rounded-md relative"
+                                className="cursor-pointer p-5 shadow-lg rounded-md relative"
                             >
                                 <h1 className="font-black border-b border-dashed pb-2">
                                     {bahanBaku.bahan.id_bahan_baku}

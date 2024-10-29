@@ -110,12 +110,15 @@ function DaftarStok({ auth }) {
                 auth={auth}
             >
                 <div className="flex m-5 ml-20">
-                    <div className="w-full h-screen overflow-auto pb-32 relative mt-10">
-                        <h1 className="font-black text-2xl uppercase text-center mb-5">
-                            data tabel semua stok bahan baku
+                    <div className="w-full relative border p-5 rounded-md">
+                        <h1 className="font-black text-xl uppercase text-center">
+                            data tabel semua bahan baku
                         </h1>
-                        <p className="text-end text-xs">
-                            <FormateDate data={tanggal} />
+                        <h2 className="text-center font-bold text-sm">
+                            Sistem Informasi Inventori dan Produksi (SIIP)
+                        </h2>
+                        <p className="text-center text-xs mb-5 border-b-4 border-double border-black pb-2">
+                            Tanggal: <FormateDate data={tanggal} />
                         </p>
                         <Table
                             header={[

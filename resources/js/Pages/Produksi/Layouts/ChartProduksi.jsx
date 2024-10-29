@@ -1,15 +1,20 @@
 import React, { useRef, useEffect } from "react";
 import { Chart, registerables } from "chart.js";
 import _ from "lodash";
+import FormateDate from "@/Components/FormateDate";
 
 Chart.register(...registerables);
 
 function ChartProduksi({ analisis }) {
+    const tanggal = new Date();
     const chartRef = useRef(null);
     const tanggalSelesai = _.groupBy(analisis, "tanggal_selesai");
     const pengirimanTertinggi = _.maxBy(analisis, "jumlah_produksi");
     const pengirimanTerendah = _.minBy(analisis, "jumlah_produksi");
-    const jumlahPengirimanProduk = _.sumBy(analisis, "jumlah_produksi");
+    const jumlahPengirimanProduk = analisis.reduce(
+        (total, item) => total + item.jumlah_produksi,
+        0
+    );
     const labels = Object.keys(tanggalSelesai);
     const labelsValue = Object.values(tanggalSelesai).map((group) =>
         group.reduce((total, item) => total + item.jumlah_produksi, 0)
@@ -66,9 +71,15 @@ function ChartProduksi({ analisis }) {
             ) : (
                 <div className="flex justify-between gap-10">
                     <div className="w-full">
-                        <h1 className="font-black text-2xl uppercase text-center mb-10">
+                        <h1 className="font-black text-xl uppercase text-center">
                             data grafik produksi selesai
                         </h1>
+                        <h2 className="text-center font-bold text-sm">
+                            Sistem Informasi Inventori dan Produksi (SIIP)
+                        </h2>
+                        <p className="text-center text-xs mb-5 border-b-4 border-double border-black pb-2">
+                            Tanggal: <FormateDate data={tanggal} />
+                        </p>
                         <canvas ref={chartRef} />
                     </div>
                     <div className="text-sm w-96 flex flex-col gap-10 mr-10">

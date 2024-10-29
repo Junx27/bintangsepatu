@@ -109,8 +109,7 @@ function LaporanProduksi({ auth }) {
         setProduksiId(produksiId);
         setCreateLaporanVerifikasi(true);
     };
-    const filterBahanBaku = _.filter(
-        dataProduksiBahanBaku,
+    const filterBahanBaku = dataProduksiBahanBaku.filter(
         (item) => item.produksi_id === produksiId
     );
     return (
@@ -179,9 +178,9 @@ function LaporanProduksi({ auth }) {
                                 {dataProduksi.map((i) => (
                                     <div
                                         key={i.id}
-                                        className="hover:border-pink-500 border border-dashed cursor-pointer relative group shadow-lg rounded-xl p-5"
+                                        className="cursor-pointer relative group shadow-lg rounded-xl p-5"
                                     >
-                                        <h1 className="font-black uppercase bg-pink-500/20 text-center p-2 border border-dashed border-pink-500 rounded-md">
+                                        <h1 className="font-black uppercase bg-pink-500/20 text-center p-2 rounded-md">
                                             {i.id_produksi}
                                         </h1>
                                         <div>
@@ -228,16 +227,12 @@ function LaporanProduksi({ auth }) {
                                             </div>
                                         </div>
                                         <div
-                                            className="group-hover:block hidden absolute z-20 top-2 right-2 cursor-pointer"
+                                            className="text-[10px] group-hover:block hidden absolute z-20 bottom-20 mb-5 right-5 cursor-pointer bg-pink-500/20 p-2 rounded-md"
                                             onClick={() =>
                                                 handleBahanBaku(i.id)
                                             }
                                         >
-                                            <img
-                                                src="/assets/icons/plus.png"
-                                                alt=""
-                                                className="w-7 h-7 bg-green-300 p-2 rounded-md"
-                                            />
+                                            <p>Selsaikan produksi</p>
                                         </div>
                                     </div>
                                 ))}
@@ -249,7 +244,7 @@ function LaporanProduksi({ auth }) {
                                             createLaporan ? "hidden" : "block"
                                         }`}
                                     >
-                                        <div className="hover:border-pink-500 border border-dashed cursor-pointer relative group shadow-lg rounded-xl p-5">
+                                        <div className="cursor-pointer relative group shadow-lg rounded-xl p-5">
                                             <div className="flex justify-end mb-2">
                                                 <div
                                                     className="bg-pink-400 p-2 rounded-md text-center  cursor-pointer w-7"
@@ -264,7 +259,7 @@ function LaporanProduksi({ auth }) {
                                                     />
                                                 </div>
                                             </div>
-                                            <h1 className="font-black uppercase bg-green-500/20 text-center p-2 border border-dashed border-green-500 rounded-md">
+                                            <h1 className="font-black uppercase bg-green-500/20 text-center p-2 rounded-md">
                                                 {dataProduksiDetail.id_produksi}
                                             </h1>
 
@@ -382,12 +377,18 @@ function LaporanProduksi({ auth }) {
                                                                 }
                                                             </td>
                                                             <td className="px-3 py-2 border text-end">
-                                                                {
-                                                                    item.harga_bahan_baku
-                                                                }
+                                                                <FormaterRupiah
+                                                                    number={
+                                                                        item.harga_bahan_baku
+                                                                    }
+                                                                />
                                                             </td>
                                                             <td className="px-3 py-2 border text-end">
-                                                                {item.sub_total}
+                                                                <FormaterRupiah
+                                                                    number={
+                                                                        item.sub_total
+                                                                    }
+                                                                />
                                                             </td>
                                                         </tr>
                                                     )
@@ -400,7 +401,9 @@ function LaporanProduksi({ auth }) {
                                                         Total biaya produksi:
                                                     </td>
                                                     <td className="border px-3 py-2 text-end">
-                                                        {totalBiaya}
+                                                        <FormaterRupiah
+                                                            number={totalBiaya}
+                                                        />
                                                     </td>
                                                 </tr>
                                             </Table>
@@ -479,9 +482,9 @@ function LaporanProduksi({ auth }) {
                                 {dataLaporanProduksi.map((i) => (
                                     <div
                                         key={i.id}
-                                        className="hover:border-pink-500 border border-dashed cursor-pointer relative group shadow-lg rounded-xl p-5"
+                                        className="cursor-pointer relative group shadow-lg rounded-xl p-5"
                                     >
-                                        <h1 className="font-bold p-2 border border-dashed border-green-500 rounded-md text-center bg-green-500/20">
+                                        <h1 className="font-bold p-2 rounded-md text-center bg-green-500/20">
                                             {i.id_laporan}
                                         </h1>
                                         <div>
@@ -530,7 +533,7 @@ function LaporanProduksi({ auth }) {
                                             </div>
                                         </div>
                                         <div
-                                            className="group-hover:block hidden absolute z-20 top-2 right-2 cursor-pointer"
+                                            className="text-[10px] group-hover:block hidden absolute z-20 bottom-32 mb-3 right-5 cursor-pointer bg-pink-500/20 p-2 rounded-md"
                                             onClick={() =>
                                                 handleVerifikasiLaporan(
                                                     i.id,
@@ -538,11 +541,7 @@ function LaporanProduksi({ auth }) {
                                                 )
                                             }
                                         >
-                                            <img
-                                                src="/assets/icons/plus.png"
-                                                alt=""
-                                                className="w-7 h-7 bg-green-300 p-2 rounded-md"
-                                            />
+                                            <p>Verifikasi laporan</p>
                                         </div>
                                     </div>
                                 ))}

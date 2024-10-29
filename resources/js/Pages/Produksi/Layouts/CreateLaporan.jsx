@@ -63,7 +63,7 @@ function CreateLaporan({ id, biayaProduksi }) {
                 </PopOver>
             )}
             <form
-                className="shadow-lg p-5 rounded-lg border border-dashed border-pink-500"
+                className="shadow-lg p-5 rounded-lg border"
                 onSubmit={handlesubmit}
             >
                 <div className="w-full">
