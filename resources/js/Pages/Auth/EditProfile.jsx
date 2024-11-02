@@ -4,7 +4,7 @@ import TextInput from "@/Components/TextInput";
 import { useForm } from "@inertiajs/react";
 import React, { useState } from "react";
 
-function EditProfile({ userId, name, image }) {
+function EditProfile({ userId, name, image, handleClose }) {
     const [preview, setPreview] = useState(null);
     const { data, setData, post } = useForm({
         _method: "PUT",
@@ -27,7 +27,19 @@ function EditProfile({ userId, name, image }) {
         post(`/user/${userId}`);
     };
     return (
-        <div>
+        <div className="border p-5 rounded-lg shadow-lg">
+            <div className="flex justify-end mb-5">
+                <div
+                    className="bg-pink-400 p-2 rounded-md text-center cursor-pointer w-7"
+                    onClick={handleClose}
+                >
+                    <img
+                        src="/assets/icons/plus.png"
+                        alt=""
+                        className="w-3 h-3 rotate-45"
+                    />
+                </div>
+            </div>
             <img
                 src={`${preview === null ? `storage/${data.image}` : preview}`}
                 alt=""

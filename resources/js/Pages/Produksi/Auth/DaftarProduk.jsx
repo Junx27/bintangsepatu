@@ -1,4 +1,4 @@
-import RoleAccess from "@/Middleware/RoleAcces";
+import RoleAccess from "@/Middleware/RoleAccess";
 import React, { useEffect, useState } from "react";
 import { navbarProduksi } from "../Data/NavbarProduksi";
 import Table from "@/Layouts/Tabel";
@@ -161,7 +161,7 @@ function DaftarProduk({ auth }) {
                         />
                         {navigasi.map((item) => (
                             <div
-                                key={item}
+                                key={item.nama}
                                 className={`relative text-[8px] p-2 px-3 rounded-md cursor-pointer mr-5 text-center hover:bg-blue-50 overflow-hidden ${
                                     view === item.nama ? "bg-blue-50" : ""
                                 }`}

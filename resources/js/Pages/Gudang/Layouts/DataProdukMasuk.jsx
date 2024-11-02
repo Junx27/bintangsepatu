@@ -8,7 +8,6 @@ import TextInput from "@/Components/TextInput";
 import Table from "@/Layouts/Tabel";
 import { useForm } from "@inertiajs/react";
 import axios from "axios";
-import _ from "lodash";
 import React, { useEffect, useState } from "react";
 
 function DataProdukMasuk() {
@@ -23,8 +22,7 @@ function DataProdukMasuk() {
         jumlah_produk_ditolak: "",
     });
 
-    const filterProdukMasuk = _.filter(
-        dataProdukMasuk,
+    const filterProdukMasuk = dataProdukMasuk.filter(
         (item) => item.status_penerimaan_produk === "diterima"
     );
 
@@ -55,6 +53,12 @@ function DataProdukMasuk() {
             fetchDataProdukMasukDetail();
         }
     }, [idProdukMasuk]);
+
+    useEffect(() => {
+        const jumlahDiterima =
+            validasi - parseInt(data.jumlah_produk_ditolak || 0);
+        setData("jumlah_produk_diterima", jumlahDiterima);
+    }, [data.jumlah_produk_ditolak]);
 
     const handleKonfirmasiUpdate = (id) => {
         setIdProdukMasuk(id);
@@ -105,175 +109,171 @@ function DataProdukMasuk() {
 
     return (
         <div>
-            <Table
-                header={[
-                    "no",
-                    "id produksi masuk",
-                    "id produk",
-                    "nama produk",
-                    "jumlah",
-                    "tanggal pengiriman",
-                    "tanggal penerimaan",
-                    "diterima (qty)",
-                    "ditolak (qty)",
-                ]}
-            >
-                {filterProdukMasuk.map((i, index) => (
-                    <tr key={i.id}>
-                        <td className="border px-3 py-2">{index + 1}</td>
-                        <td className="border px-3 py-2">
-                            {i.id_produksi_masuk}
-                        </td>
-                        <td className="border px-3 py-2">{i.id_produk}</td>
-                        <td className="border px-3 py-2">
-                            {i.produk.nama_produk}
-                        </td>
-                        <td className="border px-3 py-2">
-                            {i.jumlah_produksi}
-                        </td>
-                        <td className="border px-3 py-2">
-                            <FormateDate data={i.tanggal_pengiriman_produk} />
-                        </td>
-                        <td className="border px-3 py-2">
-                            {i.tanggal_penerimaan_produk === null ? (
-                                "-"
-                            ) : (
+            <div className={`${konfirmasiProduk ? "hidden" : "block"}`}>
+                <Table
+                    header={[
+                        "no",
+                        "id produksi masuk",
+                        "id produk",
+                        "nama produk",
+                        "jumlah",
+                        "tanggal pengiriman",
+                        "tanggal penerimaan",
+                        "diterima (qty)",
+                        "ditolak (qty)",
+                    ]}
+                >
+                    {filterProdukMasuk.map((i, index) => (
+                        <tr key={i.id}>
+                            <td className="border px-3 py-2">{index + 1}</td>
+                            <td className="border px-3 py-2">
+                                {i.id_produksi_masuk}
+                            </td>
+                            <td className="border px-3 py-2">{i.id_produk}</td>
+                            <td className="border px-3 py-2">
+                                {i.produk.nama_produk}
+                            </td>
+                            <td className="border px-3 py-2">
+                                {i.jumlah_produksi}
+                            </td>
+                            <td className="border px-3 py-2">
                                 <FormateDate
-                                    data={i.tanggal_penerimaan_produk}
+                                    data={i.tanggal_pengiriman_produk}
                                 />
-                            )}
-                        </td>
-                        <td className="border px-3 py-2">
-                            {i.jumlah_produk_diterima}
-                        </td>
-                        <td className="border px-3 py-2">
-                            <div className="flex justify-between items-center">
-                                <p>
-                                    {i.jumlah_produk_ditolak === 0
-                                        ? "-"
-                                        : i.jumlah_produk_ditolak}
-                                </p>
-                                <div
-                                    className="hover:bg-blue-50 p-2 cursor-pointer rounded-md"
-                                    onClick={() => handleKonfirmasiUpdate(i.id)}
-                                >
-                                    <Label
-                                        className={"bg-red-500"}
-                                        rotate={"rotate-90"}
+                            </td>
+                            <td className="border px-3 py-2">
+                                {i.tanggal_penerimaan_produk === null ? (
+                                    "-"
+                                ) : (
+                                    <FormateDate
+                                        data={i.tanggal_penerimaan_produk}
                                     />
+                                )}
+                            </td>
+                            <td className="border px-3 py-2">
+                                {i.jumlah_produk_diterima}
+                            </td>
+                            <td className="border px-3 py-2">
+                                <div className="flex justify-between items-center">
+                                    <p>
+                                        {i.jumlah_produk_ditolak === 0
+                                            ? "-"
+                                            : i.jumlah_produk_ditolak}
+                                    </p>
+                                    <div
+                                        className="hover:bg-blue-50 p-2 cursor-pointer rounded-md"
+                                        onClick={() =>
+                                            handleKonfirmasiUpdate(i.id)
+                                        }
+                                    >
+                                        <Label
+                                            className={"bg-red-500"}
+                                            rotate={"rotate-90"}
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                    </tr>
-                ))}
-            </Table>
+                            </td>
+                        </tr>
+                    ))}
+                </Table>
+            </div>
             {konfirmasiProduk && (
-                <PopOver>
-                    <div className="border-pink-500 border border-dashed cursor-pointer relative group shadow-lg rounded-xl p-5 w-72 -mt-32">
-                        <div className="flex justify-end mb-2">
-                            <div
-                                className="bg-pink-400 p-2 rounded-md text-center cursor-pointer w-7"
-                                onClick={handleClose}
-                            >
-                                <img
-                                    src="/assets/icons/plus.png"
-                                    alt=""
-                                    className="w-3 h-3 rotate-45"
-                                />
-                            </div>
+                <div className="border cursor-pointer relative group shadow-lg rounded-xl p-5 w-72">
+                    <div className="flex justify-end mb-2">
+                        <div
+                            className="bg-pink-400 p-2 rounded-md text-center cursor-pointer w-7"
+                            onClick={handleClose}
+                        >
+                            <img
+                                src="/assets/icons/plus.png"
+                                alt=""
+                                className="w-3 h-3 rotate-45"
+                            />
                         </div>
-                        {localErrors.jumlah_produk_ditolak && (
-                            <p className="text-center mb-5 text-xs text-red-500 absolute -top-12 left-5">
-                                {localErrors.jumlah_produk_ditolak}
-                            </p>
-                        )}
-                        {localErrors.message && (
-                            <p className="text-center mb-5 text-xs text-red-500 absolute -top-12 left-5">
-                                {localErrors.message}
-                            </p>
-                        )}
-                        <form onSubmit={submitProdukMasuk}>
-                            <div className="my-3 mt-4">
-                                <InputLabel
-                                    htmlFor="tanggal_penerimaan_produk"
-                                    value="Tanggal Penerimaan"
-                                />
-                                <TextInput
-                                    id="tanggal_penerimaan_produk"
-                                    type="date"
-                                    name="tanggal_penerimaan_produk"
-                                    value={data.tanggal_penerimaan_produk}
-                                    className="mt-1 block w-full"
-                                    autoComplete="tanggal_penerimaan_produk"
-                                    isFocused={true}
-                                    onChange={(e) =>
-                                        setData(
-                                            "tanggal_penerimaan_produk",
-                                            e.target.value
-                                        )
-                                    }
-                                />
-                                <InputError
-                                    message={
-                                        localErrors.tanggal_penerimaan_produk
-                                    }
-                                    className="mt-2"
-                                />
-                            </div>
-                            <div className="my-3">
-                                <InputLabel
-                                    htmlFor="jumlah_produk_diterima"
-                                    value="Produk Diterima"
-                                />
-                                <TextInput
-                                    id="jumlah_produk_diterima"
-                                    type="number"
-                                    name="jumlah_produk_diterima"
-                                    value={data.jumlah_produk_diterima}
-                                    className="mt-1 block w-full"
-                                    autoComplete="jumlah_produk_diterima"
-                                    isFocused={true}
-                                    onChange={(e) =>
-                                        setData(
-                                            "jumlah_produk_diterima",
-                                            e.target.value
-                                        )
-                                    }
-                                />
-                                <InputError
-                                    message={localErrors.jumlah_produk_diterima}
-                                    className="mt-2"
-                                />
-                            </div>
-                            <div className="my-3">
-                                <InputLabel
-                                    htmlFor="jumlah_produk_ditolak"
-                                    value="Produk Ditolak"
-                                />
-                                <TextInput
-                                    id="jumlah_produk_ditolak"
-                                    type="number"
-                                    name="jumlah_produk_ditolak"
-                                    value={data.jumlah_produk_ditolak}
-                                    className="mt-1 block w-full"
-                                    autoComplete="jumlah_produk_ditolak"
-                                    isFocused={true}
-                                    onChange={(e) =>
-                                        setData(
-                                            "jumlah_produk_ditolak",
-                                            e.target.value
-                                        )
-                                    }
-                                />
-                            </div>
-                            <div className="mt-5">
-                                <PrimaryButton>
-                                    update stok produk diterima
-                                </PrimaryButton>
-                            </div>
-                        </form>
                     </div>
-                </PopOver>
+                    {localErrors.jumlah_produk_ditolak && (
+                        <p className="text-center mb-5 text-xs text-red-500 absolute -top-12 left-5">
+                            {localErrors.jumlah_produk_ditolak}
+                        </p>
+                    )}
+                    {localErrors.message && (
+                        <p className="text-center mb-5 text-xs text-red-500 absolute -top-12 left-5">
+                            {localErrors.message}
+                        </p>
+                    )}
+                    <form onSubmit={submitProdukMasuk}>
+                        <div className="my-3 mt-4">
+                            <InputLabel
+                                htmlFor="tanggal_penerimaan_produk"
+                                value="Tanggal Penerimaan"
+                            />
+                            <TextInput
+                                id="tanggal_penerimaan_produk"
+                                type="date"
+                                name="tanggal_penerimaan_produk"
+                                value={data.tanggal_penerimaan_produk}
+                                className="mt-1 block w-full"
+                                autoComplete="tanggal_penerimaan_produk"
+                                isFocused={true}
+                                onChange={(e) =>
+                                    setData(
+                                        "tanggal_penerimaan_produk",
+                                        e.target.value
+                                    )
+                                }
+                            />
+                            <InputError
+                                message={localErrors.tanggal_penerimaan_produk}
+                                className="mt-2"
+                            />
+                        </div>
+                        <div className="my-3">
+                            <InputLabel
+                                htmlFor="jumlah_produk_diterima"
+                                value="Produk Diterima"
+                            />
+                            <TextInput
+                                id="jumlah_produk_diterima"
+                                type="number"
+                                name="jumlah_produk_diterima"
+                                value={data.jumlah_produk_diterima}
+                                className="mt-1 block w-full"
+                                autoComplete="jumlah_produk_diterima"
+                                readOnly
+                            />
+                            <InputError
+                                message={localErrors.jumlah_produk_diterima}
+                                className="mt-2"
+                            />
+                        </div>
+                        <div className="my-3">
+                            <InputLabel
+                                htmlFor="jumlah_produk_ditolak"
+                                value="Produk Ditolak"
+                            />
+                            <TextInput
+                                id="jumlah_produk_ditolak"
+                                type="number"
+                                name="jumlah_produk_ditolak"
+                                value={data.jumlah_produk_ditolak}
+                                className="mt-1 block w-full"
+                                autoComplete="jumlah_produk_ditolak"
+                                isFocused={true}
+                                onChange={(e) =>
+                                    setData(
+                                        "jumlah_produk_ditolak",
+                                        e.target.value
+                                    )
+                                }
+                            />
+                        </div>
+                        <div className="mt-5 flex justify-center">
+                            <PrimaryButton>
+                                verifikasi produk masuk
+                            </PrimaryButton>
+                        </div>
+                    </form>
+                </div>
             )}
         </div>
     );

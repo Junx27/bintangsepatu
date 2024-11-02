@@ -16,6 +16,7 @@ class BahanBaku extends Model
         "minimum_stok",
         "satuan_bahan_baku",
         "harga_bahan_baku",
+        "gambar_bahan_baku",
         "user_id",
     ];
 }

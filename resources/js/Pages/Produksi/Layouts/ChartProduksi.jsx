@@ -69,7 +69,7 @@ function ChartProduksi({ analisis }) {
                     </h1>
                 </div>
             ) : (
-                <div className="flex justify-between gap-10">
+                <div className="flex justify-between gap-10 items-center">
                     <div className="w-full">
                         <h1 className="font-black text-xl uppercase text-center">
                             data grafik produksi selesai
@@ -83,32 +83,32 @@ function ChartProduksi({ analisis }) {
                         <canvas ref={chartRef} />
                     </div>
                     <div className="text-sm w-96 flex flex-col gap-10 mr-10">
-                        <div className="w-56">
-                            <div className="flex flex-col items-center gap-2 bg-blue-500/20 p-5 rounded-md font-black w-full">
+                        <div className="">
+                            <div className="flex flex-col items-center gap-2 p-5 font-black w-full border">
                                 <h1>Produksi Terkirim:</h1>
                                 <p className="text-blue-500 text-2xl">
                                     {analisis.length}
                                 </p>
                             </div>
                         </div>
-                        <div className="w-56">
-                            <div className="flex flex-col items-center gap-2 bg-green-500/20 p-5 rounded-md font-black w-full">
+                        <div className="">
+                            <div className="flex flex-col items-center gap-2 p-5 font-black w-full border">
                                 <h1>Produksi Tertinggi:</h1>
                                 <p className="text-green-500 text-2xl">
                                     {pengirimanTertinggi.jumlah_produksi}
                                 </p>
                             </div>
                         </div>
-                        <div className="w-56">
-                            <div className="flex flex-col items-center gap-2 bg-red-500/20 p-5 rounded-md font-black w-full">
+                        <div className="">
+                            <div className="flex flex-col items-center gap-2 p-5 font-black w-full border">
                                 <h1>Produksi Terendah:</h1>
                                 <p className="text-red-500 text-2xl">
                                     {pengirimanTerendah.jumlah_produksi}
                                 </p>
                             </div>
                         </div>
-                        <div className="w-56">
-                            <div className="flex flex-col items-center gap-2 bg-purple-500/20 p-5 rounded-md font-black w-full">
+                        <div className="">
+                            <div className="flex flex-col items-center gap-2 p-5 font-black w-full border">
                                 <h1>Total Produksi Terkirim:</h1>
                                 <p className="text-purple-500 text-2xl">
                                     {jumlahPengirimanProduk}

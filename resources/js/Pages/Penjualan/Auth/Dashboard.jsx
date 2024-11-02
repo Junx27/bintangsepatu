@@ -1,4 +1,4 @@
-import RoleAccess from "@/Middleware/RoleAcces";
+import RoleAccess from "@/Middleware/RoleAccess";
 import { Link } from "@inertiajs/react";
 import React from "react";
 

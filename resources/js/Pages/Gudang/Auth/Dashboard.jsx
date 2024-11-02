@@ -1,4 +1,4 @@
-import RoleAccess from "@/Middleware/RoleAcces";
+import RoleAccess from "@/Middleware/RoleAccess";
 import { Link } from "@inertiajs/react";
 import React, { useEffect, useRef, useState } from "react";
 import { navbarGudang } from "../Data/NavbarGudang";
@@ -8,8 +8,28 @@ import axios from "axios";
 import ChartBahanBaku from "../Layouts/ChartBahanBaku";
 import ChartProdukMasuk from "../Layouts/ChartProdukMasuk";
 import ChartBahanBakuMasuk from "../Layouts/ChartBahanBakuMasuk";
+import Label from "@/Components/Label";
 
 function Dashboard({ auth }) {
+    const navigasi = [
+        {
+            nama: "diagram produk masuk",
+            icon: "/assets/icons/diagram.png",
+        },
+        {
+            nama: "diagram stok produk",
+            icon: "/assets/icons/diagram.png",
+        },
+        {
+            nama: "diagram bahan baku masuk",
+            icon: "/assets/icons/diagram.png",
+        },
+        {
+            nama: "diagram stok bahan baku",
+            icon: "/assets/icons/diagram.png",
+        },
+    ];
+    const [view, setView] = useState("diagram produk masuk");
     const pdfRef = useRef();
     const [dataProduk, setDataProduk] = useState([]);
     const [dataBahanBaku, setDataBahanBaku] = useState([]);
@@ -45,27 +65,69 @@ function Dashboard({ auth }) {
         <RoleAccess auth={auth} role={"gudang"}>
             <NavbarGudang
                 navbar={navbarGudang}
+                auth={auth}
                 title={"Dashboard Gudang"}
                 pdfRef={pdfRef}
                 fileName={"Dashboard.pdf"}
                 layout={"l"}
+                navigasi={
+                    <div className="text-sm flex gap-2 items-center bg-white w-full">
+                        <Label
+                            className={"bg-[#0C15F7]"}
+                            rotate={"rotate-90"}
+                        />
+                        {navigasi.map((item) => (
+                            <div
+                                key={item.nama}
+                                className={`relative text-[8px] p-2 px-3 rounded-md cursor-pointer mr-5 text-center hover:bg-blue-50 overflow-hidden ${
+                                    view === item.nama ? "bg-blue-50" : ""
+                                }`}
+                                onClick={() => setView(item.nama)}
+                            >
+                                <div className="flex flex-row gap-2 items-center">
+                                    <img
+                                        src={item.icon}
+                                        alt=""
+                                        className="w-4 h-4"
+                                    />
+                                    <p className="">
+                                        {item.nama.charAt(0).toUpperCase() +
+                                            item.nama.slice(1)}
+                                    </p>
+                                    <div
+                                        className={`absolute top-8 w-full h-2 -ml-3 bg-[#0C15F7] transition-opacity duration-300 ${
+                                            view === item.nama
+                                                ? "opacity-100"
+                                                : "opacity-0"
+                                        }`}
+                                    ></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                }
             >
-                <div className="fixed right-0 h-screen overflow-auto w-64 bg-red-500"></div>
-                <div
-                    className="h-screen overflow-auto flex flex-col gap-32 pt-20 ml-20 mr-64 px-5 pb-32"
-                    ref={pdfRef}
-                >
-                    <div className="w-full">
-                        <ChartProdukMasuk analisis={dataProdukMasuk} />
-                    </div>
-                    <div className="w-full">
-                        <ChartBahanBakuMasuk analisis={dataBahanBakuMasuk} />
-                    </div>
-                    <div className="w-full">
-                        <ChartProduk analisis={dataProduk} />
-                    </div>
-                    <div className="w-full">
-                        <ChartBahanBaku analisis={dataBahanBaku} />
+                <div className="ml-20 mt-5 mr-5">
+                    <div className="">
+                        {view === "diagram produk masuk" ? (
+                            <div className="w-full">
+                                <ChartProdukMasuk analisis={dataProdukMasuk} />
+                            </div>
+                        ) : view === "diagram stok produk" ? (
+                            <div className="w-full">
+                                <ChartProduk analisis={dataProduk} />
+                            </div>
+                        ) : view === "diagram bahan baku masuk" ? (
+                            <div className="w-full">
+                                <ChartBahanBakuMasuk
+                                    analisis={dataBahanBakuMasuk}
+                                />
+                            </div>
+                        ) : (
+                            <div className="w-full">
+                                <ChartBahanBaku analisis={dataBahanBaku} />
+                            </div>
+                        )}
                     </div>
                 </div>
             </NavbarGudang>

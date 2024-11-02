@@ -3,7 +3,7 @@ import NavbarGudang from "../Layouts/NavbarGudang";
 import { navbarGudang } from "../Data/NavbarGudang";
 import Label from "@/Components/Label";
 import { useForm } from "@inertiajs/react";
-import RoleAccess from "@/Middleware/RoleAcces";
+import RoleAccess from "@/Middleware/RoleAccess";
 import NotificationSuccess from "@/Components/NotificationSuccess";
 import PopOver from "@/Components/PopOver";
 import PrimaryButton from "@/Components/PrimaryButton";
@@ -17,7 +17,7 @@ import axios from "axios";
 function BahanBaku({ auth }) {
     const navigasi = [
         {
-            nama: "daftar bahan baku",
+            nama: "daftar semua bahan baku",
             icon: "/assets/icons/product.png",
         },
         {
@@ -25,16 +25,17 @@ function BahanBaku({ auth }) {
             icon: "/assets/icons/add-product.png",
         },
         {
-            nama: "update stok bahan baku",
+            nama: "tambah bahan baku masuk",
             icon: "/assets/icons/stock.png",
         },
     ];
-    const [view, setView] = useState("daftar bahan baku");
+    const [view, setView] = useState("daftar semua bahan baku");
     const [openEditBahanBaku, setOpenEditBahanBaku] = useState(false);
     const [openUpdateBahanBaku, setOpenUpdateBahanBaku] = useState(false);
     const [bahanBakuId, setBahanBakuId] = useState(null);
     const [dataBahanBaku, setDataBahanBaku] = useState([]);
     const [sukses, setSuccess] = useState(false);
+    const [preview, setPreview] = useState(null);
     const {
         data,
         setData,
@@ -49,10 +50,22 @@ function BahanBaku({ auth }) {
         minimum_stok: 0,
         satuan_bahan_baku: "",
         harga_bahan_baku: "",
+        gambar_bahan_baku: "",
         tanggal_masuk: "",
         stok_masuk: 0,
         user_id: auth.user.id,
     });
+    const handleImageChange = (event) => {
+        const file = event.target.files[0];
+        setData("gambar_bahan_baku", file);
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const handleChange = (e) => {
         setData(e.target.name, e.target.value);
@@ -76,11 +89,13 @@ function BahanBaku({ auth }) {
                     `/api/bintangsepatu/bahan-baku/${id}`
                 );
                 setData({
+                    _method: "PUT",
                     id_bahan_baku: response.data.id_bahan_baku,
                     nama_bahan_baku: response.data.nama_bahan_baku,
                     satuan_bahan_baku: response.data.satuan_bahan_baku,
                     harga_bahan_baku: response.data.harga_bahan_baku,
                     minimum_stok: response.data.minimum_stok,
+                    gambar_bahan_baku: response.data.gambar_bahan_baku,
                 });
             } catch (error) {
                 console.error("Failed to fetch single data", error);
@@ -100,7 +115,7 @@ function BahanBaku({ auth }) {
 
     const handleUpdate = (e) => {
         e.preventDefault();
-        put(`/bahan-baku-gudang/${bahanBakuId}`);
+        post(`/bahan-baku-gudang/${bahanBakuId}`);
     };
     const handleUpdateStok = (e) => {
         e.preventDefault();
@@ -146,21 +161,21 @@ function BahanBaku({ auth }) {
                 </PopOver>
             )}
 
-            <NavbarGudang navbar={navbarGudang} title={"Bahan Baku"}>
-                {sukses && (
-                    <NotificationSuccess message={"berhasil memasukan data"} />
-                )}
-                <div className="ml-20 mt-10 mr-5">
-                    <div className="text-sm mb-5 flex gap-2 items-center">
+            <NavbarGudang
+                navbar={navbarGudang}
+                title={"Bahan Baku"}
+                auth={auth}
+                navigasi={
+                    <div className="text-sm flex gap-2 items-center bg-white w-full">
                         <Label
                             className={"bg-[#0C15F7]"}
                             rotate={"rotate-90"}
                         />
                         {navigasi.map((item) => (
                             <div
-                                key={item}
-                                className={`relative text-[8px] p-2 rounded-md cursor-pointer mr-5 text-center hover:bg-yellow-300 ${
-                                    view === item.nama ? "bg-yellow-300" : ""
+                                key={item.nama}
+                                className={`relative text-[8px] p-2 px-3 rounded-md cursor-pointer mr-5 text-center hover:bg-blue-50 overflow-hidden ${
+                                    view === item.nama ? "bg-blue-50" : ""
                                 }`}
                                 onClick={() => setView(item.nama)}
                             >
@@ -174,16 +189,28 @@ function BahanBaku({ auth }) {
                                         {item.nama.charAt(0).toUpperCase() +
                                             item.nama.slice(1)}
                                     </p>
+                                    <div
+                                        className={`absolute top-8 w-full h-2 -ml-3 bg-[#0C15F7] transition-opacity duration-300 ${
+                                            view === item.nama
+                                                ? "opacity-100"
+                                                : "opacity-0"
+                                        }`}
+                                    ></div>
                                 </div>
                             </div>
                         ))}
                     </div>
-
-                    {view === "daftar bahan baku" ? (
+                }
+            >
+                {sukses && (
+                    <NotificationSuccess message={"berhasil memasukan data"} />
+                )}
+                <div className="ml-20 mt-5 mr-5">
+                    {view === "daftar semua bahan baku" ? (
                         <div>
                             {openEditBahanBaku && (
                                 <div className="">
-                                    <div className="flex flex-col items-center bg-white p-5 rounded w-96">
+                                    <div className="flex gap-10">
                                         <form
                                             onSubmit={handleUpdate}
                                             className="w-96 p-5 border border-dashed border-pink-500 rounded-lg"
@@ -198,6 +225,7 @@ function BahanBaku({ auth }) {
                                                     />
                                                     <p>Mengubah bahan baku</p>
                                                 </div>
+
                                                 <div className="flex justify-end">
                                                     <p
                                                         className="bg-yellow-300 p-2 rounded-md w-7 cursor-pointer"
@@ -214,6 +242,20 @@ function BahanBaku({ auth }) {
                                                         />
                                                     </p>
                                                 </div>
+                                            </div>
+                                            <div className="my-5">
+                                                <input
+                                                    type="file"
+                                                    name="image"
+                                                    accept="image/*"
+                                                    className="mt-2 block w-full text-sm text-gray-500
+                                       file:mr-4 file:py-2 file:px-4
+                                       file:border-0
+                                       file:text-sm file:font-semibold
+                                       file:bg-blue-50 file:text-blue-700
+                                       hover:file:bg-blue-100"
+                                                    onChange={handleImageChange}
+                                                />
                                             </div>
                                             {[
                                                 "id_bahan_baku",
@@ -261,6 +303,24 @@ function BahanBaku({ auth }) {
                                                 </PrimaryButton>
                                             </div>
                                         </form>
+                                        <div className="w-96 h-96">
+                                            <div className="flex gap-2 items-center font-bold border-b border-dashed pb-3">
+                                                <Label
+                                                    className={"bg-green-500"}
+                                                    rotate={"rotate-90"}
+                                                />
+                                                <p>Preview</p>
+                                            </div>
+                                            <img
+                                                src={`${
+                                                    preview === null
+                                                        ? `storage/${data.gambar_bahan_baku}`
+                                                        : preview
+                                                }`}
+                                                alt=""
+                                                className="w-full h-full object-cover rounded-lg mx-auto"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             )}
@@ -274,11 +334,11 @@ function BahanBaku({ auth }) {
                                     {dataBahanBaku.map((bahanBaku) => (
                                         <div
                                             key={bahanBaku.id}
-                                            className={`group hover:border-pink-500 border border-dashed p-5 cursor-pointer rounded-md shadow-lg relative `}
+                                            className={`group p-5 cursor-pointer rounded-md shadow-lg relative `}
                                         >
                                             <div className="w-full h-32">
                                                 <img
-                                                    src="https://inti-mesh.com/wp-content/uploads/2023/03/Raja-paku-1-1024x768.jpg"
+                                                    src={`storage/${bahanBaku.gambar_bahan_baku}`}
                                                     alt=""
                                                     className="w-full h-full object-cover rounded-lg"
                                                 />
@@ -381,53 +441,87 @@ function BahanBaku({ auth }) {
                             </div>
                         </div>
                     ) : view === "tambah bahan baku" ? (
-                        <form
-                            onSubmit={handleSubmit}
-                            className="w-96 p-5 border border-dashed border-pink-500 rounded-lg"
-                        >
-                            <div className="flex gap-2 items-center font-bold border-b border-dashed pb-3">
-                                <Label
-                                    className={"bg-green-500"}
-                                    rotate={"rotate-90"}
-                                />
-                                <p>Menambahkan bahan baku</p>
-                            </div>
-                            {[
-                                "id_bahan_baku",
-                                "nama_bahan_baku",
-                                "satuan_bahan_baku",
-                                "harga_bahan_baku",
-                                "minimum_stok",
-                            ].map((field) => (
-                                <div className="my-3" key={field}>
-                                    <InputLabel
-                                        htmlFor={field}
-                                        value={field.replace(/_/g, " ")}
+                        <div className="flex gap-10">
+                            <form
+                                onSubmit={handleSubmit}
+                                className="w-96 p-5 border rounded-lg"
+                            >
+                                <div className="flex gap-2 items-center font-bold border-b border-dashed pb-3">
+                                    <Label
+                                        className={"bg-green-500"}
+                                        rotate={"rotate-90"}
                                     />
-                                    <TextInput
-                                        id={field}
-                                        type={
-                                            field === "harga_bahan_baku" ||
-                                            field === "minimum_stok"
-                                                ? "number"
-                                                : "text"
-                                        }
-                                        name={field}
-                                        value={data[field]}
-                                        className="mt-1 block w-full"
-                                        autoComplete={field}
-                                        onChange={handleChange}
-                                    />
-                                    <InputError
-                                        message={errors[field]}
-                                        className="mt-2"
+                                    <p>Menambahkan bahan baku</p>
+                                </div>
+                                <div className="my-5">
+                                    <input
+                                        type="file"
+                                        name="image"
+                                        accept="image/*"
+                                        className="mt-2 block w-full text-sm text-gray-500
+                                       file:mr-4 file:py-2 file:px-4
+                                       file:border-0
+                                       file:text-sm file:font-semibold
+                                       file:bg-blue-50 file:text-blue-700
+                                       hover:file:bg-blue-100"
+                                        onChange={handleImageChange}
                                     />
                                 </div>
-                            ))}
-                            <div className="flex justify-end mt-5">
-                                <PrimaryButton>Tambah</PrimaryButton>
+                                {[
+                                    "id_bahan_baku",
+                                    "nama_bahan_baku",
+                                    "satuan_bahan_baku",
+                                    "harga_bahan_baku",
+                                    "minimum_stok",
+                                ].map((field) => (
+                                    <div className="my-3" key={field}>
+                                        <InputLabel
+                                            htmlFor={field}
+                                            value={field.replace(/_/g, " ")}
+                                        />
+                                        <TextInput
+                                            id={field}
+                                            type={
+                                                field === "harga_bahan_baku" ||
+                                                field === "minimum_stok"
+                                                    ? "number"
+                                                    : "text"
+                                            }
+                                            name={field}
+                                            value={data[field]}
+                                            className="mt-1 block w-full"
+                                            autoComplete={field}
+                                            onChange={handleChange}
+                                        />
+                                        <InputError
+                                            message={errors[field]}
+                                            className="mt-2"
+                                        />
+                                    </div>
+                                ))}
+                                <div className="flex justify-end mt-5">
+                                    <PrimaryButton>Tambah</PrimaryButton>
+                                </div>
+                            </form>
+                            <div className="w-96 h-96">
+                                <div className="flex gap-2 items-center font-bold border-b border-dashed pb-3">
+                                    <Label
+                                        className={"bg-green-500"}
+                                        rotate={"rotate-90"}
+                                    />
+                                    <p>Preview</p>
+                                </div>
+                                <img
+                                    src={`${
+                                        preview === null
+                                            ? "assets/clipboard.png"
+                                            : preview
+                                    }`}
+                                    alt=""
+                                    className="w-full h-full object-cover rounded-lg mx-auto"
+                                />
                             </div>
-                        </form>
+                        </div>
                     ) : (
                         <div className="w-full h-screen overflow-auto pb-32">
                             {openUpdateBahanBaku && (
@@ -435,7 +529,7 @@ function BahanBaku({ auth }) {
                                     <div className="flex flex-col items-center bg-white p-5 rounded w-96">
                                         <form
                                             onSubmit={handleUpdateStok}
-                                            className="w-96 mx-auto p-5 border border-dashed border-pink-500 rounded-lg"
+                                            className="w-96 mx-auto p-5 border rounded-lg"
                                         >
                                             <div className="flex justify-between gap-2 items-center font-bold border-b border-dashed pb-3">
                                                 <div className="flex gap-2 items-center">
@@ -445,7 +539,7 @@ function BahanBaku({ auth }) {
                                                 </div>
                                                 <div className="flex justify-end">
                                                     <p
-                                                        className="bg-yellow-300 p-2 rounded-md w-7 cursor-pointer"
+                                                        className="bg-pink-500 p-2 rounded-md w-7 cursor-pointer"
                                                         onClick={() =>
                                                             setOpenUpdateBahanBaku(
                                                                 false
@@ -518,11 +612,11 @@ function BahanBaku({ auth }) {
                                 {dataBahanBaku.map((bahanBaku) => (
                                     <div
                                         key={bahanBaku.id}
-                                        className={`group hover:border-pink-500 border border-dashed p-5 cursor-pointer rounded-md shadow-lg relative `}
+                                        className={`group p-5 cursor-pointer rounded-md shadow-lg relative `}
                                     >
                                         <div className="w-full h-32">
                                             <img
-                                                src="https://inti-mesh.com/wp-content/uploads/2023/03/Raja-paku-1-1024x768.jpg"
+                                                src={`storage/${bahanBaku.gambar_bahan_baku}`}
                                                 alt=""
                                                 className="w-full h-full object-cover rounded-lg"
                                             />
@@ -594,18 +688,14 @@ function BahanBaku({ auth }) {
                                             </div>
                                         </div>
                                         <div
-                                            className="group-hover:visible invisible absolute z-20 bottom-20 mb-6 right-5 cursor-pointer"
+                                            className="text-[10px] group-hover:block hidden absolute z-20 bottom-20 mb-4 right-5 cursor-pointer bg-green-300 p-2 rounded-md"
                                             onClick={() =>
                                                 handleUpdateStokBahanBaku(
                                                     bahanBaku.id
                                                 )
                                             }
                                         >
-                                            <img
-                                                src="/assets/icons/plus.png"
-                                                alt=""
-                                                className="w-6 h-6 bg-green-300 p-2 rounded-md"
-                                            />
+                                            <p>Update stok</p>
                                         </div>
                                     </div>
                                 ))}

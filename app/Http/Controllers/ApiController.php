@@ -114,7 +114,7 @@ class ApiController extends Controller
 
     public function dataProdukMasukGudang()
     {
-        $data = DataProdukMasuk::with("user:id,name")->with("produk:id,nama_produk")->get();
+        $data = DataProdukMasuk::with("user:id,name")->with("produk:id,nama_produk,gambar_produk")->get();
         return response()->json($data);
     }
     public function dataProdukMasukGudangDetail(String $id)

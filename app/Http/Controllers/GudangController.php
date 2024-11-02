@@ -8,6 +8,7 @@ use App\Models\DataProdukMasuk;
 use App\Models\Produk;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use PhpParser\Node\Expr\Cast\String_;
 
@@ -77,7 +78,7 @@ class GudangController extends Controller
 
         $produkMasuk = DataProdukMasuk::findOrFail($id);
         $produkMasuk->update($validated);
-        $produkMasuk->status_penerimaan_produk = "diupdate";
+        $produkMasuk->status_penerimaan_produk = "diverifikasi";
         $produkMasuk->save();
 
         $produk = Produk::findOrFail($produkMasuk->produk_id);
@@ -97,6 +98,7 @@ class GudangController extends Controller
             "minimum_stok" => "required",
             "satuan_bahan_baku" => "required",
             "harga_bahan_baku" => "required",
+            "gambar_bahan_baku" => "required",
             "user_id" => "required",
 
         ]);
@@ -105,6 +107,9 @@ class GudangController extends Controller
 
         if ($existingRecord) {
             return back()->withErrors(['message' => 'Data id bahan baku sudah ada, gagal menambahkan data bahan baku!, coba dengan id bahan baku yang berbeda']);
+        }
+        if ($request->hasFile('gambar_bahan_baku')) {
+            $validated['gambar_bahan_baku'] = $request->file('gambar_bahan_baku')->store('gambar_bahan_baku', 'public');
         }
 
         BahanBaku::create($validated);
@@ -118,9 +123,16 @@ class GudangController extends Controller
             "satuan_bahan_baku" => "required",
             "harga_bahan_baku" => "required",
             "minimum_stok" => "required",
+            "gambar_bahan_baku" => "required",
 
         ]);
         $bahanBaku = BahanBaku::findOrFail($id);
+        if ($request->hasFile('gambar_bahan_baku')) {
+            if ($bahanBaku->gambar_bahan_baku) {
+                Storage::disk('public')->delete($bahanBaku->gambar_bahan_baku);
+            }
+            $validated['gambar_bahan_baku'] = $request->file('gambar_bahan_baku')->store('gambar_bahan_baku', 'public');
+        }
         $bahanBaku->update($validated);
         return Inertia::location("/bahan-baku-gudang");
     }
@@ -148,6 +160,9 @@ class GudangController extends Controller
     public function deleteBahanBaku(String $id)
     {
         $bahanBaku = BahanBaku::findOrFail($id);
+        if ($bahanBaku->gambar_bahan_baku) {
+            Storage::disk('public')->delete($bahanBaku->gambar_bahan_baku);
+        }
         $bahanBaku->delete();
         return Inertia::location("/bahan-baku-gudang");
     }

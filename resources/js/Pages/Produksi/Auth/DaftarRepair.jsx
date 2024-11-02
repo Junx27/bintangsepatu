@@ -1,4 +1,4 @@
-import RoleAccess from "@/Middleware/RoleAcces";
+import RoleAccess from "@/Middleware/RoleAccess";
 import React from "react";
 import { navbarProduksi } from "../Data/NavbarProduksi";
 import NavbarProduksi from "../Layouts/NavbarProduksi";

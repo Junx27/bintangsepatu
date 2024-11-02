@@ -1,5 +1,6 @@
 import DownloadPDF from "@/Components/DownloadPDF";
 import Notification from "@/Components/Notification";
+import PopOver from "@/Components/PopOver";
 import EditProfile from "@/Pages/Auth/EditProfile";
 import { Head, Link, usePage } from "@inertiajs/react";
 import axios from "axios";
@@ -88,12 +89,15 @@ function NavbarProduksi({
         <div className="">
             <Head title={title} />
             {open && (
-                <div className="absolute right-0 z-50 w-72 h-screen bg-white pt-20 px-5 border-l">
-                    <EditProfile
-                        userId={auth.user.id}
-                        name={auth.user.name}
-                        image={auth.user.image}
-                    />
+                <div className="absolute z-30 w-72 h-scree">
+                    <PopOver>
+                        <EditProfile
+                            userId={auth.user.id}
+                            name={auth.user.name}
+                            image={auth.user.image}
+                            handleClose={() => setOpen(false)}
+                        />
+                    </PopOver>
                 </div>
             )}
             <div className="fixed top-0 bg-white border-b w-full py-2 left-0 px-4 z-50">
@@ -208,7 +212,7 @@ function NavbarProduksi({
                             className={`relative hover:bg-blue-50 p-2 rounded-md cursor-pointer overflow-hidden ${
                                 open ? "bg-blue-50" : ""
                             }`}
-                            onClick={() => setOpen(!open)}
+                            onClick={() => setOpen(true)}
                         >
                             <img
                                 src="/assets/icons/settings.png"
