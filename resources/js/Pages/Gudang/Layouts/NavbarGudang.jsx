@@ -18,6 +18,7 @@ function NavbarGudang({ children, navbar, title, auth, navigasi }) {
     const [dataBahanBaku, setDataBahanBaku] = useState([]);
     const [dataInventory, setDataInventory] = useState([]);
     const [dataProdukMasuk, setDataProdukMasuk] = useState([]);
+    const [dataRepair, setDataRepair] = useState([]);
 
     useEffect(() => {
         const fetchDataProdukMasuk = async () => {
@@ -62,6 +63,13 @@ function NavbarGudang({ children, navbar, title, auth, navigasi }) {
             const response = await axios.get("/api/bintangsepatu/produks");
             setDataInventory(response.data);
         };
+        const fetchDataRepair = async () => {
+            const response = await axios.get(
+                "/api/bintangsepatu/data-produk-masuk-gudang"
+            );
+            setDataRepair(response.data);
+        };
+        fetchDataRepair();
         fetchDataProdukMasuk();
         fetchDataUnVerify();
         fetchDataInventory();
@@ -82,22 +90,27 @@ function NavbarGudang({ children, navbar, title, auth, navigasi }) {
     const filterProdukMasukVerifikasi = dataProdukMasuk.filter(
         (item) => item.status_penerimaan_produk === "diterima"
     );
+    const filterDataRepair = dataRepair.filter(
+        (item) =>
+            item.jumlah_produk_ditolak !== 0 &&
+            item.status_penerimaan_produk !== "diverifikasi repair"
+    );
     return (
         <div className="">
             <Head title={title} />
-            {open && (
-                <div className="absolute z-30 w-72 h-scree">
-                    <PopOver>
-                        <EditProfile
-                            userId={auth.user.id}
-                            name={auth.user.name}
-                            image={auth.user.image}
-                            handleClose={() => setOpen(!open)}
-                        />
-                    </PopOver>
-                </div>
-            )}
-            <div className="fixed top-0 bg-white border-b w-full py-2 left-0 px-4 z-50">
+            <div
+                className={`transition-all duration-500 absolute ${
+                    open ? "z-50 right-0 mt-0" : "z-50 -right-96 mt-0"
+                }`}
+            >
+                <EditProfile
+                    userId={auth.user.id}
+                    name={auth.user.name}
+                    image={auth.user.image}
+                    handleClose={() => setOpen(!open)}
+                />
+            </div>
+            <div className="fixed top-0 bg-white border-b w-full py-2 left-0 px-4 z-40">
                 <div className="flex gap-10 justify-between items-center">
                     <div className="flex justify-start items-center gap-2">
                         <img
@@ -139,7 +152,7 @@ function NavbarGudang({ children, navbar, title, auth, navigasi }) {
                     </div>
                 </div>
             </div>
-            <div className="w-[60px] transition-all duration-700 fixed z-40 bg-white border-r h-screen pt-20">
+            <div className="w-[60px] transition-all duration-700 fixed z-30 bg-white border-r h-screen pt-20">
                 <div className="mx-2 flex flex-col gap-5 text-sm">
                     {data.map((i) => (
                         <Link
@@ -179,6 +192,11 @@ function NavbarGudang({ children, navbar, title, auth, navigasi }) {
                                 nama={i.nama}
                                 parameter={"Produk Masuk"}
                                 data={filterProdukMasukVerifikasi}
+                            />
+                            <Notification
+                                nama={i.nama}
+                                parameter={"Produk Keluar"}
+                                data={filterDataRepair}
                             />
                         </Link>
                     ))}

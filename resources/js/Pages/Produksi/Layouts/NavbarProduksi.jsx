@@ -14,6 +14,7 @@ function NavbarProduksi({
     pdfRef,
     fileName,
     layout,
+    navigasi,
 }) {
     const { url } = usePage();
     const [open, setOpen] = useState(false);
@@ -88,19 +89,19 @@ function NavbarProduksi({
     return (
         <div className="">
             <Head title={title} />
-            {open && (
-                <div className="absolute z-30 w-72 h-scree">
-                    <PopOver>
-                        <EditProfile
-                            userId={auth.user.id}
-                            name={auth.user.name}
-                            image={auth.user.image}
-                            handleClose={() => setOpen(false)}
-                        />
-                    </PopOver>
-                </div>
-            )}
-            <div className="fixed top-0 bg-white border-b w-full py-2 left-0 px-4 z-50">
+            <div
+                className={`transition-all duration-500 absolute ${
+                    open ? "z-50 right-0 mt-0" : "z-50 -right-96 mt-0"
+                }`}
+            >
+                <EditProfile
+                    userId={auth.user.id}
+                    name={auth.user.name}
+                    image={auth.user.image}
+                    handleClose={() => setOpen(!open)}
+                />
+            </div>
+            <div className="fixed top-0 bg-white border-b w-full py-2 left-0 px-4 z-40">
                 <div className="flex gap-10 justify-between items-center">
                     <div className="flex justify-start items-center gap-2">
                         <img
@@ -111,103 +112,9 @@ function NavbarProduksi({
                         <h2 className="font-black text-[#0C15F7]">
                             BINTANG SEPATU
                         </h2>
+                        <div>{navigasi}</div>
                     </div>
-                    <div className="text-[8px] flex items-center gap-5">
-                        <div className="flex items-center gap-2">
-                            <img
-                                src="/assets/icons/stock.png"
-                                alt=""
-                                className="w-5 h-5"
-                            />
-                            <p>
-                                Jumlah Produk:{" "}
-                                <span className="font-black text-[#0C15F7]">
-                                    {dataInventory.length}
-                                </span>
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <img
-                                src="/assets/icons/stock.png"
-                                alt=""
-                                className="w-5 h-5"
-                            />
-                            <p>
-                                Jumlah Bahan Baku:{" "}
-                                <span className="font-black text-[#0C15F7]">
-                                    {dataBahanBaku.length}
-                                </span>
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <img
-                                src="/assets/icons/checklist.png"
-                                alt=""
-                                className="w-5 h-5"
-                            />
-                            <p>
-                                Terverifikasi:{" "}
-                                <span className="font-black text-green-500">
-                                    {dataLaporanProduksi.length}
-                                </span>
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <img
-                                src="/assets/icons/enroll.png"
-                                alt=""
-                                className="w-5 h-5"
-                            />
-                            <p>
-                                Belum Terverifikasi:{" "}
-                                <span className="font-black text-red-500">
-                                    {dataVerification.length +
-                                        dataUnVerification.length}
-                                </span>
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <img
-                                src="/assets/icons/preparation.png"
-                                alt=""
-                                className="w-5 h-5"
-                            />
-                            <p>
-                                Persiapan Produksi:{" "}
-                                <span className="font-black text-red-500">
-                                    {dataProduksi.length}
-                                </span>
-                            </p>
-                        </div>
-                    </div>
-                    <div className="flex gap-5 text-[7px]">
-                        <div className="hover:bg-blue-50 p-2 rounded-md cursor-pointer">
-                            <img
-                                src="/assets/icons/search.png"
-                                alt=""
-                                className="w-4 h-4"
-                            />
-                        </div>
-                        <div className="hover:bg-blue-50 p-2 rounded-md cursor-pointer">
-                            <img
-                                src="/assets/icons/check.png"
-                                alt=""
-                                className="w-4 h-4"
-                            />
-                        </div>
-                        <div className="hover:bg-blue-50 p-2 rounded-md cursor-pointer">
-                            <DownloadPDF
-                                pdfRef={pdfRef}
-                                fileName={fileName}
-                                layout={layout}
-                            >
-                                <img
-                                    src="/assets/icons/printer.png"
-                                    alt=""
-                                    className="w-4 h-4"
-                                />
-                            </DownloadPDF>
-                        </div>
+                    <div className="flex gap-5 items-center text-xs">
                         <div
                             className={`relative hover:bg-blue-50 p-2 rounded-md cursor-pointer overflow-hidden ${
                                 open ? "bg-blue-50" : ""
@@ -225,10 +132,7 @@ function NavbarProduksi({
                                 }`}
                             ></div>
                         </div>
-                    </div>
-
-                    <div className="flex gap-5 items-center text-xs">
-                        <h1 className="text-sm font-bold w-32 truncate text-end capitalize">
+                        <h1 className="text-sm font-bold truncate text-end capitalize">
                             {auth.user.name}
                         </h1>
                         <img
@@ -239,7 +143,7 @@ function NavbarProduksi({
                     </div>
                 </div>
             </div>
-            <div className="w-[60px] transition-all duration-700 fixed z-40 bg-white border-r h-screen pt-20">
+            <div className="w-[60px] transition-all duration-700 fixed z-30 bg-white border-r h-screen pt-20">
                 <div className="mx-2 flex flex-col gap-5 text-sm">
                     {data.map((i) => (
                         <Link

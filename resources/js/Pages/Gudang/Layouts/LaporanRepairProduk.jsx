@@ -1,44 +1,46 @@
 import FormateDate from "@/Components/FormateDate";
-import Label from "@/Components/Label";
 import Table from "@/Layouts/Tabel";
-import { useForm } from "@inertiajs/react";
 import axios from "axios";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
 import React, { useEffect, useState } from "react";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 
-function LaporanProdukMasuk() {
-    const tanggal = new Date();
-    const [dataProdukMasuk, setDataProdukMasuk] = useState([]);
+function LaporanRepairProduk() {
+    const [dataRepair, setDataRepair] = useState([]);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
+    const tanggal = new Date();
 
     useEffect(() => {
-        const fetchDataProdukMasuk = async () => {
-            const response = await axios.get(
-                "/api/bintangsepatu/data-produk-masuk-gudang"
-            );
-            setDataProdukMasuk(response.data);
+        const fetchDataRepair = async () => {
+            try {
+                const response = await axios.get(
+                    "/api/bintangsepatu/data-produk-masuk-gudang"
+                );
+                setDataRepair(response.data);
+            } catch (error) {
+                console.error("Error fetching data repair:", error);
+            }
         };
 
-        fetchDataProdukMasuk();
+        fetchDataRepair();
     }, []);
 
-    const filterProdukMasuk = dataProdukMasuk.filter(
+    const filterDataRepair = dataRepair.filter(
         (item) =>
-            item.status_penerimaan_produk === "diverifikasi" ||
+            item.jumlah_produk_ditolak !== 0 &&
             item.status_penerimaan_produk === "diverifikasi repair"
     );
 
-    const filteredData = filterProdukMasuk.filter((item) => {
+    const filteredData = filterDataRepair.filter((item) => {
         const createdAt = new Date(item.tanggal_penerimaan_produk);
         const matchesDateRange =
             (!startDate || createdAt >= new Date(startDate)) &&
             (!endDate ||
                 createdAt <= new Date(new Date(endDate).setHours(23, 59, 59)));
-        const matchesSearchTerm = item.id_produk
-            .toLowerCase()
+        const matchesSearchTerm = item.produk.nama_produk
+            .toString()
             .includes(searchTerm.toLowerCase());
 
         return matchesDateRange && matchesSearchTerm;
@@ -48,7 +50,7 @@ function LaporanProdukMasuk() {
         const doc = new jsPDF("portrait", "mm", "a4");
         doc.setFontSize(18);
         doc.setFont("helvetica", "bold");
-        doc.text("DATA TABEL PRODUK MASUK", 105, 22, { align: "center" });
+        doc.text("Laporan Repair Produk", 105, 22, { align: "center" });
         doc.setFontSize(12);
         doc.setFont("helvetica", "normal");
         doc.text("Sistem Informasi Inventori dan Produksi (SIIP)", 105, 30, {
@@ -69,18 +71,20 @@ function LaporanProdukMasuk() {
 
         const columns = [
             { header: "No", dataKey: "no" },
-            { header: "ID", dataKey: "id_produksi_masuk" },
-            { header: "Nama", dataKey: "nama_produk" },
+            { header: "ID Produksi Masuk", dataKey: "id_produksi_masuk" },
+            { header: "ID Produk", dataKey: "id_produk" },
+            { header: "Nama Produk", dataKey: "nama_produk" },
             { header: "Jumlah", dataKey: "jumlah" },
             { header: "Tanggal Pengiriman", dataKey: "tanggal_pengiriman" },
             { header: "Tanggal Penerimaan", dataKey: "tanggal_penerimaan" },
-            { header: "Diterima", dataKey: "diterima" },
-            { header: "Ditolak", dataKey: "ditolak" },
+            { header: "Diterima (Qty)", dataKey: "diterima_qty" },
+            { header: "Ditolak (Qty)", dataKey: "ditolak_qty" },
         ];
 
         const data = filteredData.map((item, index) => ({
             no: index + 1,
             id_produksi_masuk: item.id_produksi_masuk,
+            id_produk: item.id_produk,
             nama_produk: item.produk.nama_produk,
             jumlah: item.jumlah_produksi,
             tanggal_pengiriman: new Date(
@@ -91,8 +95,8 @@ function LaporanProdukMasuk() {
                       "id-ID"
                   )
                 : "-",
-            diterima: item.jumlah_produk_diterima,
-            ditolak: item.jumlah_produk_ditolak || "-",
+            diterima_qty: item.jumlah_produk_diterima,
+            ditolak_qty: item.jumlah_produk_ditolak,
         }));
 
         doc.autoTable(columns, data, {
@@ -109,23 +113,11 @@ function LaporanProdukMasuk() {
                 lineWidth: 0.1,
                 fontStyle: "bold",
             },
-            bodyStyles: {
-                lineWidth: 0.1,
-                fillColor: [255, 255, 255],
-            },
-            columnStyles: {
-                id_produksi_masuk: { cellWidth: "auto" },
-                nama_produk: { cellWidth: 40, halign: "left" },
-                tanggal_pengiriman: { cellWidth: "auto", halign: "left" },
-                tanggal_penerimaan: { cellWidth: "auto", halign: "left" },
-                jumlah: { cellWidth: "auto" },
-                diterima: { cellWidth: "auto" },
-                ditolak: { cellWidth: "auto" },
-            },
+            bodyStyles: { lineWidth: 0.1, fillColor: [255, 255, 255] },
             theme: "grid",
         });
 
-        doc.save("Laporan_Produk_Masuk.pdf");
+        doc.save("Laporan_Repair_Produk.pdf");
     };
 
     const downloadCSV = () => {
@@ -133,12 +125,13 @@ function LaporanProdukMasuk() {
         const headers = [
             "No",
             "ID Produksi Masuk",
+            "ID Produk",
             "Nama Produk",
             "Jumlah",
             "Tanggal Pengiriman",
             "Tanggal Penerimaan",
-            "Diterima",
-            "Ditolak",
+            "Diterima (Qty)",
+            "Ditolak (Qty)",
         ];
         csvRows.push(headers.join(","));
 
@@ -146,6 +139,7 @@ function LaporanProdukMasuk() {
             const row = [
                 index + 1,
                 item.id_produksi_masuk,
+                item.id_produk,
                 item.produk.nama_produk,
                 item.jumlah_produksi,
                 new Date(item.tanggal_pengiriman_produk).toLocaleDateString(
@@ -157,7 +151,7 @@ function LaporanProdukMasuk() {
                       ).toLocaleDateString("id-ID")
                     : "-",
                 item.jumlah_produk_diterima,
-                item.jumlah_produk_ditolak || "-",
+                item.jumlah_produk_ditolak,
             ];
             csvRows.push(row.join(","));
         });
@@ -167,8 +161,7 @@ function LaporanProdukMasuk() {
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.setAttribute("href", url);
-        link.setAttribute("download", "Laporan_Produk_Masuk.csv");
-        link.style.visibility = "hidden";
+        link.setAttribute("download", "Laporan_Repair_Produk.csv");
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -183,7 +176,7 @@ function LaporanProdukMasuk() {
     return (
         <div>
             <h1 className="font-black text-xl uppercase text-center">
-                Data Tabel Semua Produk Masuk
+                Data Tabel Repair Produk
             </h1>
             <h2 className="text-center font-bold text-sm">
                 Sistem Informasi Inventori dan Produksi (SIIP)
@@ -215,7 +208,7 @@ function LaporanProdukMasuk() {
                 <div className="w-full flex justify-center">
                     <input
                         type="text"
-                        placeholder="Cari berdasarkan id produk"
+                        placeholder="Cari berdasarkan nama produk"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="border rounded-md px-2 py-1 w-full text-[10px]"
@@ -228,7 +221,7 @@ function LaporanProdukMasuk() {
                     >
                         <img
                             src="assets/icons/pdf.png"
-                            alt=""
+                            alt="PDF Icon"
                             className="w-5 h-5"
                         />
                         <p>Unduh PDF</p>
@@ -239,7 +232,7 @@ function LaporanProdukMasuk() {
                     >
                         <img
                             src="assets/icons/sheets.png"
-                            alt=""
+                            alt="CSV Icon"
                             className="w-5 h-5"
                         />
                         <p>Unduh CSV</p>
@@ -255,44 +248,42 @@ function LaporanProdukMasuk() {
                     "Jumlah",
                     "Tanggal Pengiriman",
                     "Tanggal Penerimaan",
-                    "Diterima (qty)",
-                    "Ditolak (qty)",
+                    "Diterima (Qty)",
+                    "Ditolak (Qty)",
                 ]}
             >
-                {filteredData.map((i, index) => (
-                    <tr key={i.id}>
-                        <td className="border px-3 py-2 text-center">
-                            {index + 1}
+                {filteredData.map((item, index) => (
+                    <tr key={item.id}>
+                        <td className="border px-3 py-2">{index + 1}</td>
+                        <td className="border px-3 py-2">
+                            {item.id_produksi_masuk}
+                        </td>
+                        <td className="border px-3 py-2">{item.id_produk}</td>
+                        <td className="border px-3 py-2">
+                            {item.produk.nama_produk}
                         </td>
                         <td className="border px-3 py-2">
-                            {i.id_produksi_masuk}
-                        </td>
-                        <td className="border px-3 py-2">{i.id_produk}</td>
-                        <td className="border px-3 py-2">
-                            {i.produk.nama_produk}
+                            {item.jumlah_produksi}
                         </td>
                         <td className="border px-3 py-2">
-                            {i.jumlah_produksi}
+                            <FormateDate
+                                data={item.tanggal_pengiriman_produk}
+                            />
                         </td>
                         <td className="border px-3 py-2">
-                            <FormateDate data={i.tanggal_pengiriman_produk} />
-                        </td>
-                        <td className="border px-3 py-2">
-                            {i.tanggal_penerimaan_produk === null ? (
-                                "-"
-                            ) : (
+                            {item.tanggal_penerimaan_produk ? (
                                 <FormateDate
-                                    data={i.tanggal_penerimaan_produk}
+                                    data={item.tanggal_penerimaan_produk}
                                 />
+                            ) : (
+                                "-"
                             )}
                         </td>
                         <td className="border px-3 py-2">
-                            {i.jumlah_produk_diterima}
+                            {item.jumlah_produk_diterima}
                         </td>
                         <td className="border px-3 py-2">
-                            {i.jumlah_produk_ditolak === 0
-                                ? "-"
-                                : i.jumlah_produk_ditolak}
+                            {item.jumlah_produk_ditolak || "-"}
                         </td>
                     </tr>
                 ))}
@@ -301,4 +292,4 @@ function LaporanProdukMasuk() {
     );
 }
 
-export default LaporanProdukMasuk;
+export default LaporanRepairProduk;

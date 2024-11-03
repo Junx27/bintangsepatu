@@ -25,6 +25,10 @@ function KonfirmasiProduk({ auth }) {
             nama: "verifikasi produk masuk",
             icon: "/assets/icons/preparation.png",
         },
+        {
+            nama: "konfirmasi pesanan masuk",
+            icon: "/assets/icons/shopping.png",
+        },
     ];
     const [view, setView] = useState("konfirmasi produk masuk");
     const [idProdukMasuk, setIdProdukMasuk] = useState(null);

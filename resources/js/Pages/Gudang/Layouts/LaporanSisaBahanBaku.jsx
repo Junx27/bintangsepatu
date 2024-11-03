@@ -26,7 +26,11 @@ function LaporanSisaBahanBaku() {
         fetchData();
     }, []);
 
-    const filteredData = dataBahanBaku.filter((item) => {
+    const sisaBahanBaku = dataBahanBaku.filter(
+        (item) => item.sisa_bahan_baku !== 0
+    );
+
+    const filteredData = sisaBahanBaku.filter((item) => {
         const createdAt = new Date(item.created_at);
         const matchesDateRange =
             (!startDate || createdAt >= new Date(startDate)) &&

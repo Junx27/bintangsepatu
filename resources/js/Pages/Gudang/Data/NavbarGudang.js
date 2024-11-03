@@ -25,12 +25,6 @@ export const navbarGudang = [
     },
     {
         id: 5,
-        nama: "Pesan Masuk",
-        link: "/pesan-masuk-gudang",
-        gambar: "/assets/icons/email.png",
-    },
-    {
-        id: 6,
         nama: "Buat Laporan",
         link: "/laporan-gudang",
         gambar: "/assets/icons/list.png",

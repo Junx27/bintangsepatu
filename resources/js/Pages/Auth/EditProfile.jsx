@@ -27,7 +27,7 @@ function EditProfile({ userId, name, image, handleClose }) {
         post(`/user/${userId}`);
     };
     return (
-        <div className="border p-5 rounded-lg shadow-lg">
+        <div className="border p-5 rounded-bl-lg shadow-lg bg-white">
             <div className="flex justify-end mb-5">
                 <div
                     className="bg-pink-400 p-2 rounded-md text-center cursor-pointer w-7"

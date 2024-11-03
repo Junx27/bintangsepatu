@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BahanBaku;
 use App\Models\DataBahanBakuMasuk;
 use App\Models\DataProdukMasuk;
+use App\Models\DataRepair;
 use App\Models\Produk;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -37,10 +38,6 @@ class GudangController extends Controller
     public function produkKeluar()
     {
         return Inertia::render("Gudang/Auth/ProdukKeluar");
-    }
-    public function pesanMasuk()
-    {
-        return Inertia::render("Gudang/Auth/PesanMasuk");
     }
     public function bahanBaku()
     {
@@ -165,5 +162,23 @@ class GudangController extends Controller
         }
         $bahanBaku->delete();
         return Inertia::location("/bahan-baku-gudang");
+    }
+
+    //membuat data produk repair
+
+    public function createRepairProduk(Request $request)
+    {
+        $validate = $request->validate([
+            'jumlah_produk_repair' => 'required',
+            'user_id' => 'required',
+            "produk_id" => 'required',
+            "id" => 'required',
+        ]);
+
+        DataRepair::create($validate);
+        $produkMasuk = DataProdukMasuk::findOrFail($validate["id"]);
+        $produkMasuk->status_penerimaan_produk = "diverifikasi repair";
+        $produkMasuk->save();
+        return Inertia::location("/produk-keluar-gudang");
     }
 }

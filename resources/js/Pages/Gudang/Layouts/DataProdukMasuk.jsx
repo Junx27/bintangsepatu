@@ -109,74 +109,91 @@ function DataProdukMasuk() {
 
     return (
         <div>
-            <div className={`${konfirmasiProduk ? "hidden" : "block"}`}>
-                <Table
-                    header={[
-                        "no",
-                        "id produksi masuk",
-                        "id produk",
-                        "nama produk",
-                        "jumlah",
-                        "tanggal pengiriman",
-                        "tanggal penerimaan",
-                        "diterima (qty)",
-                        "ditolak (qty)",
-                    ]}
-                >
-                    {filterProdukMasuk.map((i, index) => (
-                        <tr key={i.id}>
-                            <td className="border px-3 py-2">{index + 1}</td>
-                            <td className="border px-3 py-2">
-                                {i.id_produksi_masuk}
-                            </td>
-                            <td className="border px-3 py-2">{i.id_produk}</td>
-                            <td className="border px-3 py-2">
-                                {i.produk.nama_produk}
-                            </td>
-                            <td className="border px-3 py-2">
-                                {i.jumlah_produksi}
-                            </td>
-                            <td className="border px-3 py-2">
-                                <FormateDate
-                                    data={i.tanggal_pengiriman_produk}
-                                />
-                            </td>
-                            <td className="border px-3 py-2">
-                                {i.tanggal_penerimaan_produk === null ? (
-                                    "-"
-                                ) : (
+            {filterProdukMasuk.length === 0 ? (
+                <div className="mt-20">
+                    <img
+                        src="/assets/icons/no-document.png"
+                        alt=""
+                        className="w-10 h-10 mx-auto"
+                    />
+                    <h1 className="text-xs text-red-500 text-center mt-5">
+                        Belum ada data produk verifikasi
+                    </h1>
+                </div>
+            ) : (
+                <div className={`${konfirmasiProduk ? "hidden" : "block"}`}>
+                    <Table
+                        header={[
+                            "no",
+                            "id produksi masuk",
+                            "id produk",
+                            "nama produk",
+                            "jumlah",
+                            "tanggal pengiriman",
+                            "tanggal penerimaan",
+                            "diterima (qty)",
+                            "ditolak (qty)",
+                        ]}
+                    >
+                        {filterProdukMasuk.map((i, index) => (
+                            <tr key={i.id}>
+                                <td className="border px-3 py-2">
+                                    {index + 1}
+                                </td>
+                                <td className="border px-3 py-2">
+                                    {i.id_produksi_masuk}
+                                </td>
+                                <td className="border px-3 py-2">
+                                    {i.id_produk}
+                                </td>
+                                <td className="border px-3 py-2">
+                                    {i.produk.nama_produk}
+                                </td>
+                                <td className="border px-3 py-2">
+                                    {i.jumlah_produksi}
+                                </td>
+                                <td className="border px-3 py-2">
                                     <FormateDate
-                                        data={i.tanggal_penerimaan_produk}
+                                        data={i.tanggal_pengiriman_produk}
                                     />
-                                )}
-                            </td>
-                            <td className="border px-3 py-2">
-                                {i.jumlah_produk_diterima}
-                            </td>
-                            <td className="border px-3 py-2">
-                                <div className="flex justify-between items-center">
-                                    <p>
-                                        {i.jumlah_produk_ditolak === 0
-                                            ? "-"
-                                            : i.jumlah_produk_ditolak}
-                                    </p>
-                                    <div
-                                        className="hover:bg-blue-50 p-2 cursor-pointer rounded-md"
-                                        onClick={() =>
-                                            handleKonfirmasiUpdate(i.id)
-                                        }
-                                    >
-                                        <Label
-                                            className={"bg-red-500"}
-                                            rotate={"rotate-90"}
+                                </td>
+                                <td className="border px-3 py-2">
+                                    {i.tanggal_penerimaan_produk === null ? (
+                                        "-"
+                                    ) : (
+                                        <FormateDate
+                                            data={i.tanggal_penerimaan_produk}
                                         />
+                                    )}
+                                </td>
+                                <td className="border px-3 py-2">
+                                    {i.jumlah_produk_diterima}
+                                </td>
+                                <td className="border px-3 py-2">
+                                    <div className="flex justify-between items-center">
+                                        <p>
+                                            {i.jumlah_produk_ditolak === 0
+                                                ? "-"
+                                                : i.jumlah_produk_ditolak}
+                                        </p>
+                                        <div
+                                            className="hover:bg-blue-50 p-2 cursor-pointer rounded-md"
+                                            onClick={() =>
+                                                handleKonfirmasiUpdate(i.id)
+                                            }
+                                        >
+                                            <Label
+                                                className={"bg-red-500"}
+                                                rotate={"rotate-90"}
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                        </tr>
-                    ))}
-                </Table>
-            </div>
+                                </td>
+                            </tr>
+                        ))}
+                    </Table>
+                </div>
+            )}
             {konfirmasiProduk && (
                 <div className="border cursor-pointer relative group shadow-lg rounded-xl p-5 w-72">
                     <div className="flex justify-end mb-2">

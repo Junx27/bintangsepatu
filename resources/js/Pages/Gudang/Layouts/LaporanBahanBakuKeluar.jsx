@@ -1,43 +1,38 @@
-import FormateDate from "@/Components/FormateDate";
-import Label from "@/Components/Label";
-import Table from "@/Layouts/Tabel";
-import { useForm } from "@inertiajs/react";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
+import axios from "axios"; // Ensure axios is imported
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import React, { useEffect, useState } from "react";
+import FormateDate from "@/Components/FormateDate";
+import Table from "@/Layouts/Tabel";
 
-function LaporanProdukMasuk() {
+function LaporanBahanBakuKeluar() {
     const tanggal = new Date();
-    const [dataProdukMasuk, setDataProdukMasuk] = useState([]);
+    const [dataBahanBaku, setDataBahanBaku] = useState([]);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
-        const fetchDataProdukMasuk = async () => {
-            const response = await axios.get(
-                "/api/bintangsepatu/data-produk-masuk-gudang"
-            );
-            setDataProdukMasuk(response.data);
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(
+                    "/api/bintangsepatu/data-laporan-produksis"
+                );
+                setDataBahanBaku(response.data);
+            } catch (error) {
+                console.error("Failed to fetch data", error);
+            }
         };
-
-        fetchDataProdukMasuk();
+        fetchData();
     }, []);
 
-    const filterProdukMasuk = dataProdukMasuk.filter(
-        (item) =>
-            item.status_penerimaan_produk === "diverifikasi" ||
-            item.status_penerimaan_produk === "diverifikasi repair"
-    );
-
-    const filteredData = filterProdukMasuk.filter((item) => {
-        const createdAt = new Date(item.tanggal_penerimaan_produk);
+    const filteredData = dataBahanBaku.filter((item) => {
+        const createdAt = new Date(item.created_at);
         const matchesDateRange =
             (!startDate || createdAt >= new Date(startDate)) &&
             (!endDate ||
                 createdAt <= new Date(new Date(endDate).setHours(23, 59, 59)));
-        const matchesSearchTerm = item.id_produk
+        const matchesSearchTerm = item.bahan.id_bahan_baku
             .toLowerCase()
             .includes(searchTerm.toLowerCase());
 
@@ -48,7 +43,9 @@ function LaporanProdukMasuk() {
         const doc = new jsPDF("portrait", "mm", "a4");
         doc.setFontSize(18);
         doc.setFont("helvetica", "bold");
-        doc.text("DATA TABEL PRODUK MASUK", 105, 22, { align: "center" });
+        doc.text("DATA TABEL PENGGUNAAN BAHAN BAKU PRODUKSI", 105, 22, {
+            align: "center",
+        });
         doc.setFontSize(12);
         doc.setFont("helvetica", "normal");
         doc.text("Sistem Informasi Inventori dan Produksi (SIIP)", 105, 30, {
@@ -66,33 +63,23 @@ function LaporanProdukMasuk() {
             { align: "center" }
         );
         doc.line(14, 42, 196, 42);
-
         const columns = [
             { header: "No", dataKey: "no" },
-            { header: "ID", dataKey: "id_produksi_masuk" },
-            { header: "Nama", dataKey: "nama_produk" },
+            { header: "ID", dataKey: "id" },
+            { header: "Nama", dataKey: "nama" },
+            { header: "Tanggal", dataKey: "tanggal" },
             { header: "Jumlah", dataKey: "jumlah" },
-            { header: "Tanggal Pengiriman", dataKey: "tanggal_pengiriman" },
-            { header: "Tanggal Penerimaan", dataKey: "tanggal_penerimaan" },
-            { header: "Diterima", dataKey: "diterima" },
-            { header: "Ditolak", dataKey: "ditolak" },
+            { header: "Pemakaian", dataKey: "pemakaian" },
+            { header: "Sisa", dataKey: "sisa" },
         ];
-
         const data = filteredData.map((item, index) => ({
             no: index + 1,
-            id_produksi_masuk: item.id_produksi_masuk,
-            nama_produk: item.produk.nama_produk,
-            jumlah: item.jumlah_produksi,
-            tanggal_pengiriman: new Date(
-                item.tanggal_pengiriman_produk
-            ).toLocaleDateString("id-ID"),
-            tanggal_penerimaan: item.tanggal_penerimaan_produk
-                ? new Date(item.tanggal_penerimaan_produk).toLocaleDateString(
-                      "id-ID"
-                  )
-                : "-",
-            diterima: item.jumlah_produk_diterima,
-            ditolak: item.jumlah_produk_ditolak || "-",
+            id: item.id_bahan_baku,
+            nama: item.bahan.nama_bahan_baku,
+            tanggal: new Date(item.created_at).toLocaleDateString("id-ID"),
+            jumlah: item.jumlah_bahan_baku,
+            pemakaian: item.pemakaian_bahan_baku,
+            sisa: item.sisa_bahan_baku,
         }));
 
         doc.autoTable(columns, data, {
@@ -114,50 +101,45 @@ function LaporanProdukMasuk() {
                 fillColor: [255, 255, 255],
             },
             columnStyles: {
-                id_produksi_masuk: { cellWidth: "auto" },
-                nama_produk: { cellWidth: 40, halign: "left" },
-                tanggal_pengiriman: { cellWidth: "auto", halign: "left" },
-                tanggal_penerimaan: { cellWidth: "auto", halign: "left" },
+                id: { cellWidth: "auto" },
+                nama: { cellWidth: 40, halign: "left" },
+                tanggal: { cellWidth: 50, halign: "left" },
                 jumlah: { cellWidth: "auto" },
-                diterima: { cellWidth: "auto" },
-                ditolak: { cellWidth: "auto" },
+                pemakaian: { cellWidth: "auto" },
+                sisa: { cellWidth: "auto" },
             },
             theme: "grid",
         });
 
-        doc.save("Laporan_Produk_Masuk.pdf");
+        doc.save("Laporan_Penggunaan_Bahan_Baku.pdf");
     };
 
     const downloadCSV = () => {
         const csvRows = [];
         const headers = [
             "No",
-            "ID Produksi Masuk",
-            "Nama Produk",
-            "Jumlah",
-            "Tanggal Pengiriman",
-            "Tanggal Penerimaan",
-            "Diterima",
-            "Ditolak",
+            "Id Bahan Baku",
+            "Nama Bahan Baku",
+            "Tanggal",
+            "Jumlah Bahan Baku",
+            "Pemakaian Bahan Baku",
+            "Sisa Bahan Baku",
         ];
         csvRows.push(headers.join(","));
 
         filteredData.forEach((item, index) => {
             const row = [
                 index + 1,
-                item.id_produksi_masuk,
-                item.produk.nama_produk,
-                item.jumlah_produksi,
-                new Date(item.tanggal_pengiriman_produk).toLocaleDateString(
-                    "id-ID"
-                ),
-                item.tanggal_penerimaan_produk
-                    ? new Date(
-                          item.tanggal_penerimaan_produk
-                      ).toLocaleDateString("id-ID")
-                    : "-",
-                item.jumlah_produk_diterima,
-                item.jumlah_produk_ditolak || "-",
+                item.bahan.id_bahan_baku,
+                item.bahan.nama_bahan_baku,
+                new Date(item.created_at).toLocaleDateString("id-ID", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                }),
+                item.jumlah_bahan_baku,
+                item.pemakaian_bahan_baku,
+                item.sisa_bahan_baku,
             ];
             csvRows.push(row.join(","));
         });
@@ -167,7 +149,7 @@ function LaporanProdukMasuk() {
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.setAttribute("href", url);
-        link.setAttribute("download", "Laporan_Produk_Masuk.csv");
+        link.setAttribute("download", "Laporan_Penggunaan_Bahan_Baku.csv");
         link.style.visibility = "hidden";
         document.body.appendChild(link);
         link.click();
@@ -181,9 +163,9 @@ function LaporanProdukMasuk() {
     };
 
     return (
-        <div>
+        <div className="pb-32">
             <h1 className="font-black text-xl uppercase text-center">
-                Data Tabel Semua Produk Masuk
+                Data Tabel penggunaan Bahan Baku Produksi
             </h1>
             <h2 className="text-center font-bold text-sm">
                 Sistem Informasi Inventori dan Produksi (SIIP)
@@ -199,6 +181,7 @@ function LaporanProdukMasuk() {
                     >
                         <p>Reset All</p>
                     </div>
+
                     <input
                         type="date"
                         value={startDate}
@@ -215,7 +198,7 @@ function LaporanProdukMasuk() {
                 <div className="w-full flex justify-center">
                     <input
                         type="text"
-                        placeholder="Cari berdasarkan id produk"
+                        placeholder="Cari berdasarkan id bahan baku"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="border rounded-md px-2 py-1 w-full text-[10px]"
@@ -249,50 +232,46 @@ function LaporanProdukMasuk() {
             <Table
                 header={[
                     "No",
-                    "ID Produksi Masuk",
-                    "ID Produk",
-                    "Nama Produk",
-                    "Jumlah",
-                    "Tanggal Pengiriman",
-                    "Tanggal Penerimaan",
-                    "Diterima (qty)",
-                    "Ditolak (qty)",
+                    "Id Bahan Baku",
+                    "Nama Bahan Baku",
+                    "Tanggal",
+                    "Jumlah Bahan Baku",
+                    "Pemakaian Bahan Baku",
+                    "Sisa Bahan Baku",
                 ]}
             >
-                {filteredData.map((i, index) => (
-                    <tr key={i.id}>
+                {filteredData.map((item, index) => (
+                    <tr
+                        key={item.id_bahan_baku}
+                        className="hover:bg-blue-50 cursor-pointer"
+                    >
                         <td className="border px-3 py-2 text-center">
                             {index + 1}
                         </td>
-                        <td className="border px-3 py-2">
-                            {i.id_produksi_masuk}
+                        <td className="px-5 py-2 border font-bold uppercase">
+                            {item.bahan.id_bahan_baku}
                         </td>
-                        <td className="border px-3 py-2">{i.id_produk}</td>
-                        <td className="border px-3 py-2">
-                            {i.produk.nama_produk}
+                        <td className="px-5 py-2 border w-64 capitalize">
+                            {item.bahan.nama_bahan_baku}
                         </td>
-                        <td className="border px-3 py-2">
-                            {i.jumlah_produksi}
-                        </td>
-                        <td className="border px-3 py-2">
-                            <FormateDate data={i.tanggal_pengiriman_produk} />
-                        </td>
-                        <td className="border px-3 py-2">
-                            {i.tanggal_penerimaan_produk === null ? (
-                                "-"
-                            ) : (
-                                <FormateDate
-                                    data={i.tanggal_penerimaan_produk}
-                                />
+                        <td className="px-5 py-2 border">
+                            {new Date(item.created_at).toLocaleDateString(
+                                "id-ID",
+                                {
+                                    day: "numeric",
+                                    month: "long",
+                                    year: "numeric",
+                                }
                             )}
                         </td>
-                        <td className="border px-3 py-2">
-                            {i.jumlah_produk_diterima}
+                        <td className="px-5 py-2 border">
+                            {item.jumlah_bahan_baku}
                         </td>
-                        <td className="border px-3 py-2">
-                            {i.jumlah_produk_ditolak === 0
-                                ? "-"
-                                : i.jumlah_produk_ditolak}
+                        <td className="px-3 py-2 border">
+                            {item.pemakaian_bahan_baku}
+                        </td>
+                        <td className="px-5 py-2 border">
+                            {item.sisa_bahan_baku}
                         </td>
                     </tr>
                 ))}
@@ -301,4 +280,4 @@ function LaporanProdukMasuk() {
     );
 }
 
-export default LaporanProdukMasuk;
+export default LaporanBahanBakuKeluar;
